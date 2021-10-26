@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Text?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/1.8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.company.ValidatorController">
+    <children>
+        <MenuBar nodeOrientation="RIGHT_TO_LEFT" VBox.vgrow="NEVER">
+            <menus>
+                <Menu mnemonicParsing="false" text="Help">
+                    <items>
+                        <MenuItem fx:id="linkToViki" mnemonicParsing="false">
+                            <graphic>
+                                <Hyperlink text="Viki" textOverrun="CENTER_ELLIPSIS" />
+                            </graphic></MenuItem>
+                    </items>
+                </Menu>
+            </menus>
+        </MenuBar>
+        <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
+            <TextField fx:id="schemaFilePas" layoutX="241.0" layoutY="23.0" prefHeight="26.0" prefWidth="571.0" promptText="Указать путь к файлу схем. К примеру fcsExport.xsd" />
+            <TextField layoutX="241.0" layoutY="74.0" prefHeight="26.0" prefWidth="571.0" promptText="Указать путь к файлу .xml для валидации по схеме .xsd" fx:id="xmlFilePas" />
+            <Text layoutX="56.0" layoutY="40.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Схемы" />
+            <Text layoutX="61.0" layoutY="91.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Файл" />
+            <Button fx:id="startValidation" layoutX="398.0" layoutY="145.0" mnemonicParsing="false" onAction="#initialize" text="Start Validation" />
+            <Button fx:id="selectSchemaFile" layoutX="119.0" layoutY="21.0" mnemonicParsing="false" text="Выберете файл" />
+            <Button fx:id="selectXMLFile" layoutX="119.0" layoutY="71.0" mnemonicParsing="false" text="Выберете файл" />
+            <TextArea fx:id="console" layoutX="15.0" layoutY="200.0" prefHeight="360.0" prefWidth="870.0" />
+        </AnchorPane>
+    </children>
+</VBox>
