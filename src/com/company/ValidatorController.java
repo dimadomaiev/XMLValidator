@@ -8,13 +8,13 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 
 public class ValidatorController {
     public static String pasForSchema;
-    public static String pasForFile;
     public static List<File> pasForFiles;
     public static String consoleToArea;
 
@@ -36,8 +36,9 @@ public class ValidatorController {
 
     @FXML
     private TextField xmlFilePas;
+
     void xfp() {
-        xmlFilePas.setPromptText(pasForFile);
+        xmlFilePas.setPromptText(String.valueOf(pasForFiles));
     }
 
     @FXML
@@ -52,8 +53,8 @@ public class ValidatorController {
     @FXML
     private TextArea console;
 
-    void area(){
-        console.appendText("\n" + consoleToArea );      // добавляем текст в TextArea с сохранением
+    void area(String consoleToArea) {
+        console.appendText("\n" + consoleToArea);      // добавляем текст в TextArea с сохранением
         //console.setText("\n" + consoleToArea );          // Добавляем новый текст в TextArea
         console.setWrapText(true);                        // Выравнивать текст в область текстого поля
 
@@ -68,21 +69,27 @@ public class ValidatorController {
         });
 
         selectXMLFile.setOnAction(actionEvent -> {          // задаем действие на кнопку selectXMLFile
-            SimpleXMLValidator.stageFile(window);             // Вызываем метод выбора файла
+            SimpleXMLValidator.stageFile(window);           // Вызываем метод выбора файла
             this.xfp();                                     // Задаем в промте поля путь к выбранному файлу
         });
-
-        startValidation.setOnAction(actionEvent -> {        // Задаем действие на кнопку startValidation
-            for (int i = 0; i < pasForFiles.size(); i++) {
-                if (pasForFiles.get(i).getName().endsWith(".xml")) {
-                    SimpleXMLValidator.XMLFile = new File(pasForFiles.get(i).getAbsolutePath());
+        startValidation.setOnAction(actionEvent -> {
+            for (File pasForFile : pasForFiles) {
+                //System.out.println(pasForFiles);
+                if (pasForFile.getName().endsWith(".xml")) {
+                    SimpleXMLValidator.XMLFile = new File(pasForFile.getAbsolutePath());
                     SimpleXMLValidator.validate(SimpleXMLValidator.schemaFile, SimpleXMLValidator.XMLFile); // Передаем файлы в метод валидации
-                    this.area();
 
                 }
+                if (pasForFile.getName().endsWith(".zip")) {
+                    SimpleXMLValidator.XMLFile = new File(pasForFile.getAbsolutePath());
+                    try {
+                        SimpleXMLValidator.unzip(pasForFile.getAbsolutePath(),SimpleXMLValidator.destDirectory);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        System.out.println("Error in unzip method " + e);
+                    }
+                }
             }
-                                              // Вызов метода вывода полученного результата валидации в текстовое поле
         });
-
     }
 }
