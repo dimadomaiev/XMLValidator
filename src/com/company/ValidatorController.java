@@ -38,7 +38,7 @@ public class ValidatorController {
     private TextField xmlFilePas;
 
     void xfp() {
-        xmlFilePas.setPromptText(String.valueOf(pasForFiles));
+        xmlFilePas.setPromptText(String.valueOf(SimpleXMLValidator.XMLFile));
     }
 
     @FXML
@@ -69,12 +69,12 @@ public class ValidatorController {
 
         selectXMLFile.setOnAction(actionEvent -> {          // задаем действие на кнопку selectXMLFile
             SimpleXMLValidator.stageFile(window);           // Вызываем метод выбора файла
+
             this.xfp();                                     // Задаем в промте поля путь к выбранному файлу
         });
         startValidation.setOnAction(actionEvent -> {
             try {
                 for (File pasForFile : pasForFiles) {
-                    //System.out.println(pasForFiles);
                     if (pasForFile.getName().endsWith(".xml")) {
                         SimpleXMLValidator.XMLFile = new File(pasForFile.getAbsolutePath());
                         SimpleXMLValidator.validate(SimpleXMLValidator.schemaFile, SimpleXMLValidator.XMLFile); // Передаем файлы в метод валидации
@@ -84,13 +84,13 @@ public class ValidatorController {
                         SimpleXMLValidator.XMLFile = new File(pasForFile.getAbsolutePath());
                         SimpleXMLValidator.unzip(pasForFile.getAbsolutePath(), SimpleXMLValidator.destDirectory);
                         SimpleXMLValidator.validate(SimpleXMLValidator.schemaFile, SimpleXMLValidator.XMLFile); // Передаем файлы в метод валидации
+                        this.area();
                     }
-                    this.area();
                 }
             } catch (IOException | NullPointerException e) {
                 e.printStackTrace();
                 System.out.println("Error in unzip method " + e);
-                consoleToArea = ("Select any file(s) " + e);
+                consoleToArea = "Please select any file(s)!";
                 this.area();
             }
         });

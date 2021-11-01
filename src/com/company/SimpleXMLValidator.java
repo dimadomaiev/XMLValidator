@@ -1,13 +1,12 @@
 package com.company;
 
 import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.xml.sax.SAXException;
+
 import javax.xml.XMLConstants;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
@@ -15,15 +14,16 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.DecimalFormat;
-import java.time.LocalDate;
-import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 public class SimpleXMLValidator extends Application {
     public static File schemaFile = null;
     public static File XMLFile = null;
+    public static File pasToSelectedFiles = null;
     public static String destDirectory = "C:\\XMLValidator\\tempFiles";
 
     @Override
@@ -36,11 +36,11 @@ public class SimpleXMLValidator extends Application {
     }
 
     public static void main(String[] args) {
-	// write your code here
         launch(args);
+        deleteAllTempFile();
     }
 
-    public static void stageSchema (Stage s) {
+    public static void stageSchema(Stage s) {
         FileChooser fileChooser = new FileChooser();
         FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
                 "XSD files (*.xsd)", "*.xsd");
@@ -59,13 +59,24 @@ public class SimpleXMLValidator extends Application {
             //System.out.println("schemaFile получает значение selectedFile = " + schemaFile);
         }
     }
-    public static void stageFile (Stage s){
+
+    public static void stageFile(Stage s) {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("XML files (*.xml)","*.xml", "*.zip"));// ,"*.7z","*.rar"));
-        if (XMLFile != null) {
-            fileChooser.setInitialDirectory(new File(XMLFile.getParent()));
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("XML files (*.xml)", "*.xml", "*.zip"));// ,"*.7z","*.rar"));
+
+        if (pasToSelectedFiles != null) {
+            fileChooser.setInitialDirectory(new File(pasToSelectedFiles.getParent()));
         }
         ValidatorController.pasForFiles = fileChooser.showOpenMultipleDialog(s);
+        if (ValidatorController.pasForFiles != null) {
+            for (File pasForFile : ValidatorController.pasForFiles) {
+                if (pasForFile != null) {
+                    pasToSelectedFiles = new File(pasForFile.getAbsolutePath());
+                    XMLFile = pasToSelectedFiles;
+                    //System.out.println("Путь к файлу после выбора архива " + pasForFile.getAbsolutePath());
+                }
+            }
+        }
     }
 
     public static void validate(File absoluteSchemaPath, File absoluteFilePath) {
@@ -82,9 +93,10 @@ public class SimpleXMLValidator extends Application {
             if (absoluteSchemaPath == null || absoluteFilePath == null) {
                 System.out.println(ValidatorController.consoleToArea = "Пожалуйста укажите путь к схеме и файлу XML для валидации");
             } else if (absoluteSchemaPath != null || absoluteFilePath != null) {
-                ValidatorController.consoleToArea = (myXMLFile.getSystemId() + " - IS NOT VALID."+ "\n" + "Reason: " + e);
+                ValidatorController.consoleToArea = (myXMLFile.getSystemId() + " - IS NOT VALID." + "\n" + "Reason: " + e);
             }
-        } catch (IOException e) {}
+        } catch (IOException e) {
+        }
     }
 
     static String fileSize(Long size) {
@@ -104,9 +116,9 @@ public class SimpleXMLValidator extends Application {
     }
 
     public static void unzip(String zipFilePath, String destDirectory) throws IOException {
-        File destDir = new File(destDirectory);
-        if (!destDir.exists()) {
-            destDir.mkdir();
+
+        if (!Files.exists(Paths.get(destDirectory))) {
+            Files.createDirectories(Paths.get(destDirectory));
         }
         ZipInputStream zipIn = new ZipInputStream(new FileInputStream(zipFilePath));
         ZipEntry entry = zipIn.getNextEntry();
@@ -127,8 +139,10 @@ public class SimpleXMLValidator extends Application {
         }
         zipIn.close();
     }
+
     /**
      * Extracts a zip entry (file entry)
+     *
      * @param zipIn
      * @param filePath
      * @throws IOException
@@ -141,6 +155,18 @@ public class SimpleXMLValidator extends Application {
             bos.write(bytesIn, 0, read);
         }
         bos.close();
+    }
+
+    static void deleteAllTempFile() {
+        File file = new File(destDirectory);
+        String[] filesList;
+        if (file.isDirectory()) {
+            filesList = file.list();
+            for (int i = 0; i < filesList.length; i++) {
+                File tempFile = new File(file, filesList[i]);
+                tempFile.delete();
+            }
+        }
     }
 }
 
