@@ -68,23 +68,6 @@ public class SimpleXMLValidator extends Application {
         ValidatorController.pasForFiles = fileChooser.showOpenMultipleDialog(s);
     }
 
-    public static void parseFiles (List<File> pasForFiles) throws IOException {
-        for (File pasForFile : pasForFiles) {
-            //System.out.println(pasForFiles);
-            if (pasForFile.getName().endsWith(".xml")) {
-                SimpleXMLValidator.XMLFile = new File(pasForFile.getAbsolutePath());
-                SimpleXMLValidator.validate(SimpleXMLValidator.schemaFile, SimpleXMLValidator.XMLFile); // Передаем файлы в метод валидации
-
-            }
-            if (pasForFile.getName().endsWith(".zip")) {
-                SimpleXMLValidator.XMLFile = new File(pasForFile.getAbsolutePath());
-
-            }
-        }
-    }
-
-
-
     public static void validate(File absoluteSchemaPath, File absoluteFilePath) {
         File mySchemaFile = new File(String.valueOf(absoluteSchemaPath));
         Source myXMLFile = new StreamSource(new File(String.valueOf(absoluteFilePath)));
@@ -130,6 +113,7 @@ public class SimpleXMLValidator extends Application {
         // iterates over entries in the zip file
         while (entry != null) {
             String filePath = destDirectory + File.separator + entry.getName();
+            XMLFile = new File(filePath);
             if (!entry.isDirectory()) {
                 // if the entry is a file, extracts it
                 extractFile(zipIn, filePath);

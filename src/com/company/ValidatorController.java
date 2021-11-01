@@ -53,11 +53,10 @@ public class ValidatorController {
     @FXML
     private TextArea console;
 
-    void area(String consoleToArea) {
+    void area() {
         console.appendText("\n" + consoleToArea);      // добавляем текст в TextArea с сохранением
         //console.setText("\n" + consoleToArea );          // Добавляем новый текст в TextArea
         console.setWrapText(true);                        // Выравнивать текст в область текстого поля
-
     }
 
     @FXML
@@ -73,22 +72,26 @@ public class ValidatorController {
             this.xfp();                                     // Задаем в промте поля путь к выбранному файлу
         });
         startValidation.setOnAction(actionEvent -> {
-            for (File pasForFile : pasForFiles) {
-                //System.out.println(pasForFiles);
-                if (pasForFile.getName().endsWith(".xml")) {
-                    SimpleXMLValidator.XMLFile = new File(pasForFile.getAbsolutePath());
-                    SimpleXMLValidator.validate(SimpleXMLValidator.schemaFile, SimpleXMLValidator.XMLFile); // Передаем файлы в метод валидации
-
-                }
-                if (pasForFile.getName().endsWith(".zip")) {
-                    SimpleXMLValidator.XMLFile = new File(pasForFile.getAbsolutePath());
-                    try {
-                        SimpleXMLValidator.unzip(pasForFile.getAbsolutePath(),SimpleXMLValidator.destDirectory);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        System.out.println("Error in unzip method " + e);
+            try {
+                for (File pasForFile : pasForFiles) {
+                    //System.out.println(pasForFiles);
+                    if (pasForFile.getName().endsWith(".xml")) {
+                        SimpleXMLValidator.XMLFile = new File(pasForFile.getAbsolutePath());
+                        SimpleXMLValidator.validate(SimpleXMLValidator.schemaFile, SimpleXMLValidator.XMLFile); // Передаем файлы в метод валидации
+                        this.area();
                     }
+                    if (pasForFile.getName().endsWith(".zip")) {
+                        SimpleXMLValidator.XMLFile = new File(pasForFile.getAbsolutePath());
+                        SimpleXMLValidator.unzip(pasForFile.getAbsolutePath(), SimpleXMLValidator.destDirectory);
+                        SimpleXMLValidator.validate(SimpleXMLValidator.schemaFile, SimpleXMLValidator.XMLFile); // Передаем файлы в метод валидации
+                    }
+                    this.area();
                 }
+            } catch (IOException | NullPointerException e) {
+                e.printStackTrace();
+                System.out.println("Error in unzip method " + e);
+                consoleToArea = ("Select any file(s) " + e);
+                this.area();
             }
         });
     }
