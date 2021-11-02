@@ -24,7 +24,8 @@ public class SimpleXMLValidator extends Application {
     public static File schemaFile = null;
     public static File XMLFile = null;
     public static File pasToSelectedFiles = null;
-    public static String destDirectory = "C:\\XMLValidator\\tempFiles";
+    public static String tempFiles = "C:\\XMLValidator\\tempFiles\\";
+    public static String invalidFiles = "C:\\XMLValidator\\invalidFiles\\";
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -37,7 +38,6 @@ public class SimpleXMLValidator extends Application {
 
     public static void main(String[] args) {
         launch(args);
-        deleteAllTempFile();
     }
 
     public static void stageSchema(Stage s) {
@@ -79,7 +79,7 @@ public class SimpleXMLValidator extends Application {
         }
     }
 
-    public static void validate(File absoluteSchemaPath, File absoluteFilePath) {
+    public static void validate(File absoluteSchemaPath, File absoluteFilePath) throws IOException {
         File mySchemaFile = new File(String.valueOf(absoluteSchemaPath));
         Source myXMLFile = new StreamSource(new File(String.valueOf(absoluteFilePath)));
         SchemaFactory schemaFactory = SchemaFactory
@@ -88,15 +88,26 @@ public class SimpleXMLValidator extends Application {
             Schema schema = schemaFactory.newSchema(mySchemaFile);
             Validator validator = schema.newValidator();
             validator.validate(myXMLFile);
-            ValidatorController.consoleToArea = (myXMLFile.getSystemId() + " - IS VALID ");
-        } catch (SAXException e) {
+            ValidatorController.consoleToArea = (myXMLFile.getSystemId() + " - Size is: " + (new File(fileSize(absoluteFilePath.length()))) + " - IS VALID ");
+
+        } catch (SAXException | IOException e) {
             if (absoluteSchemaPath == null || absoluteFilePath == null) {
-                System.out.println(ValidatorController.consoleToArea = "Пожалуйста укажите путь к схеме и файлу XML для валидации");
+                System.out.println(ValidatorController.consoleToArea = "Please provide the path to the schema and/or XML file for validation!!!");
             } else if (absoluteSchemaPath != null || absoluteFilePath != null) {
-                ValidatorController.consoleToArea = (myXMLFile.getSystemId() + " - IS NOT VALID." + "\n" + "Reason: " + e);
+                ValidatorController.consoleToArea = (myXMLFile.getSystemId() + " - Size is: " + (new File(fileSize(absoluteFilePath.length()))) + " - IS NOT VALID." + "\n" + "Reason: " + e);
             }
-        } catch (IOException e) {
         }
+    }
+
+    public static void writeFile(String files) throws IOException {
+        if (!Files.exists(Paths.get(invalidFiles))) {
+            Files.createDirectories(Paths.get(invalidFiles));
+        }
+        Writer output;
+        File file = new File(files);
+        output = new BufferedWriter(new FileWriter(file));
+        output.close();
+        ValidatorController.consoleToArea = ("Invalid file !!! SAVED !!! to directory: " + invalidFiles);
     }
 
     static String fileSize(Long size) {
@@ -127,8 +138,11 @@ public class SimpleXMLValidator extends Application {
             String filePath = destDirectory + File.separator + entry.getName();
             XMLFile = new File(filePath);
             if (!entry.isDirectory()) {
-                // if the entry is a file, extracts it
-                extractFile(zipIn, filePath);
+                if (entry.getName().endsWith(".xml")) {
+                    // if the entry is a file, extracts it
+                    extractFile(zipIn, filePath);
+                }
+
             } else {
                 // if the entry is a directory, make the directory
                 File dir = new File(filePath);
@@ -140,30 +154,24 @@ public class SimpleXMLValidator extends Application {
         zipIn.close();
     }
 
-    /**
-     * Extracts a zip entry (file entry)
-     *
-     * @param zipIn
-     * @param filePath
-     * @throws IOException
-     */
     private static void extractFile(ZipInputStream zipIn, String filePath) throws IOException {
         BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(filePath));
         byte[] bytesIn = new byte[8192];
-        int read = 0;
+        int read;
         while ((read = zipIn.read(bytesIn)) != -1) {
             bos.write(bytesIn, 0, read);
         }
         bos.close();
     }
 
-    static void deleteAllTempFile() {
-        File file = new File(destDirectory);
+    static void deleteAllTempFile(String destDir) {
+        File file = new File(destDir);
         String[] filesList;
         if (file.isDirectory()) {
             filesList = file.list();
-            for (int i = 0; i < filesList.length; i++) {
-                File tempFile = new File(file, filesList[i]);
+            assert filesList != null;
+            for (String s : filesList) {
+                File tempFile = new File(destDir + s);
                 tempFile.delete();
             }
         }

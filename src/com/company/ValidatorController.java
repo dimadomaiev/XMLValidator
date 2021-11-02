@@ -55,12 +55,12 @@ public class ValidatorController {
 
     void area() {
         console.appendText("\n" + consoleToArea);      // добавляем текст в TextArea с сохранением
-        //console.setText("\n" + consoleToArea );          // Добавляем новый текст в TextArea
         console.setWrapText(true);                        // Выравнивать текст в область текстого поля
     }
 
     @FXML
     void initialize() {
+        SimpleXMLValidator.deleteAllTempFile(SimpleXMLValidator.invalidFiles);
         Stage window = new Stage();                         // Инициализируем окно
         selectSchemaFile.setOnAction(actionEvent -> {       // задаем действие на кнопку selectSchemaFile
             SimpleXMLValidator.stageSchema(window);           // Вызываем метод выбора файла
@@ -69,10 +69,12 @@ public class ValidatorController {
 
         selectXMLFile.setOnAction(actionEvent -> {          // задаем действие на кнопку selectXMLFile
             SimpleXMLValidator.stageFile(window);           // Вызываем метод выбора файла
-
             this.xfp();                                     // Задаем в промте поля путь к выбранному файлу
         });
         startValidation.setOnAction(actionEvent -> {
+            consoleToArea = ("\n" + "!!! STARTING VALIDATION !!!" + "\n");
+            this.area();
+
             try {
                 for (File pasForFile : pasForFiles) {
                     if (pasForFile.getName().endsWith(".xml")) {
@@ -82,9 +84,20 @@ public class ValidatorController {
                     }
                     if (pasForFile.getName().endsWith(".zip")) {
                         SimpleXMLValidator.XMLFile = new File(pasForFile.getAbsolutePath());
-                        SimpleXMLValidator.unzip(pasForFile.getAbsolutePath(), SimpleXMLValidator.destDirectory);
-                        SimpleXMLValidator.validate(SimpleXMLValidator.schemaFile, SimpleXMLValidator.XMLFile); // Передаем файлы в метод валидации
-                        this.area();
+                        SimpleXMLValidator.unzip(pasForFile.getAbsolutePath(), SimpleXMLValidator.tempFiles);
+                        File file = new File(SimpleXMLValidator.tempFiles);
+                        String[] filesList;
+                        if (file.isDirectory()) {
+                            filesList = file.list();
+                            assert filesList != null;
+                            for (String s : filesList) {
+                                SimpleXMLValidator.validate(SimpleXMLValidator.schemaFile, new File(SimpleXMLValidator.tempFiles + s));
+                                this.area();
+                                SimpleXMLValidator.writeFile(SimpleXMLValidator.invalidFiles + s);
+                                this.area();
+                            }
+                        }
+                        SimpleXMLValidator.deleteAllTempFile(SimpleXMLValidator.tempFiles);
                     }
                 }
             } catch (IOException | NullPointerException e) {
