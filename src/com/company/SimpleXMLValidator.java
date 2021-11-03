@@ -18,6 +18,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
 public class SimpleXMLValidator extends Application {
@@ -103,11 +104,21 @@ public class SimpleXMLValidator extends Application {
         if (!Files.exists(Paths.get(invalidFiles))) {
             Files.createDirectories(Paths.get(invalidFiles));
         }
-        Writer output;
-        File file = new File(files);
-        output = new BufferedWriter(new FileWriter(file));
-        output.close();
-        ValidatorController.consoleToArea = ("Invalid file !!! SAVED !!! to directory: " + invalidFiles);
+        File file = new File(invalidFiles + XMLFile);
+        //if (file.getName().endsWith(".xml")) {
+        if (ValidatorController.consoleToArea.contains("IS NOT VALID.")) {
+            Writer output;
+            file = new File(files);
+            output = new BufferedWriter(new FileWriter(file));
+            output.close();
+            ValidatorController.consoleToArea = ("Invalid file !!! SAVED !!! to directory: " + invalidFiles + "\n");
+        }
+
+        //else {
+        //    ValidatorController.consoleToArea = "Zip file is not contains XML files...";
+        //    System.out.println("Zip file is not contains XML files...");
+        //}
+
     }
 
     static String fileSize(Long size) {
@@ -132,26 +143,34 @@ public class SimpleXMLValidator extends Application {
             Files.createDirectories(Paths.get(destDirectory));
         }
         ZipInputStream zipIn = new ZipInputStream(new FileInputStream(zipFilePath));
-        ZipEntry entry = zipIn.getNextEntry();
-        // iterates over entries in the zip file
-        while (entry != null) {
-            String filePath = destDirectory + File.separator + entry.getName();
-            XMLFile = new File(filePath);
-            if (!entry.isDirectory()) {
-                if (entry.getName().endsWith(".xml")) {
-                    // if the entry is a file, extracts it
-                    extractFile(zipIn, filePath);
-                }
+        try {
+            ZipEntry entry = zipIn.getNextEntry();
+            // iterates over entries in the zip file
+            while (entry != null) {
+                String filePath = destDirectory + entry.getName();
+                String replacedFilePath = filePath;
+                if (filePath.contains("/")) {
 
-            } else {
+                    replacedFilePath = (filePath.replace("/", "\\"));
+                }
+                System.out.println(replacedFilePath);
+                if (entry.isDirectory()) {
+                    mkDir(new File(replacedFilePath));
+                }
+                XMLFile = new File(replacedFilePath);
                 // if the entry is a directory, make the directory
-                File dir = new File(filePath);
-                dir.mkdirs();
+                if (!entry.isDirectory() & replacedFilePath.endsWith(".xml")) {
+                    // if the entry is a file, extracts it
+                    extractFile(zipIn, replacedFilePath);
+                    //tempFiles = replacedFilePath; // Найти где удаляется этот путь перед валидацией.
+                }
+                zipIn.closeEntry();
+                entry = zipIn.getNextEntry();
             }
-            zipIn.closeEntry();
-            entry = zipIn.getNextEntry();
+            zipIn.close();
+        } catch (IllegalArgumentException e) {
+            ValidatorController.consoleToArea = "Encoding error in to the Zip file - " + e;
         }
-        zipIn.close();
     }
 
     private static void extractFile(ZipInputStream zipIn, String filePath) throws IOException {
@@ -164,17 +183,23 @@ public class SimpleXMLValidator extends Application {
         bos.close();
     }
 
-    static void deleteAllTempFile(String destDir) {
-        File file = new File(destDir);
-        String[] filesList;
-        if (file.isDirectory()) {
-            filesList = file.list();
-            assert filesList != null;
-            for (String s : filesList) {
-                File tempFile = new File(destDir + s);
-                tempFile.delete();
+    static void mkDir(File file) {
+        File[] contents = file.listFiles();
+        if (contents != null) {
+            for (File f : contents) {
+                mkDir(f);
             }
         }
+        file.mkdirs();
+    }
+
+    static void deleteDir(File file) {
+        File[] contents = file.listFiles();
+        if (contents != null) {
+            for (File f : contents) {
+                deleteDir(f);
+            }
+        }
+        file.delete();
     }
 }
-

@@ -59,8 +59,8 @@ public class ValidatorController {
     }
 
     @FXML
-    void initialize() {
-        SimpleXMLValidator.deleteAllTempFile(SimpleXMLValidator.invalidFiles);
+    void initialize() throws IOException {
+        SimpleXMLValidator.deleteDir(new File(SimpleXMLValidator.invalidFiles));
         Stage window = new Stage();                         // Инициализируем окно
         selectSchemaFile.setOnAction(actionEvent -> {       // задаем действие на кнопку selectSchemaFile
             SimpleXMLValidator.stageSchema(window);           // Вызываем метод выбора файла
@@ -79,7 +79,7 @@ public class ValidatorController {
                 for (File pasForFile : pasForFiles) {
                     if (pasForFile.getName().endsWith(".xml")) {
                         SimpleXMLValidator.XMLFile = new File(pasForFile.getAbsolutePath());
-                        SimpleXMLValidator.validate(SimpleXMLValidator.schemaFile, SimpleXMLValidator.XMLFile); // Передаем файлы в метод валидации
+                        SimpleXMLValidator.validate(SimpleXMLValidator.schemaFile, SimpleXMLValidator.XMLFile); //Передаем файлы в метод валидации
                         this.area();
                     }
                     if (pasForFile.getName().endsWith(".zip")) {
@@ -91,19 +91,22 @@ public class ValidatorController {
                             filesList = file.list();
                             assert filesList != null;
                             for (String s : filesList) {
-                                SimpleXMLValidator.validate(SimpleXMLValidator.schemaFile, new File(SimpleXMLValidator.tempFiles + s));
+                                SimpleXMLValidator.validate(SimpleXMLValidator.schemaFile, new File(SimpleXMLValidator.tempFiles + s)); //Передаем разархивированные файлы в метод валидации
                                 this.area();
-                                SimpleXMLValidator.writeFile(SimpleXMLValidator.invalidFiles + s);
-                                this.area();
+                                String toEqual = consoleToArea;
+                                SimpleXMLValidator.writeFile(SimpleXMLValidator.invalidFiles + s);                  // Передаем файлы на сохранение  (нужно разобраться как сохранить только не валидные)
+                                if (!consoleToArea.equals(toEqual)){
+                                    this.area();
+                                }
                             }
                         }
-                        SimpleXMLValidator.deleteAllTempFile(SimpleXMLValidator.tempFiles);
+                        SimpleXMLValidator.deleteDir(new File(SimpleXMLValidator.tempFiles));
                     }
                 }
             } catch (IOException | NullPointerException e) {
                 e.printStackTrace();
                 System.out.println("Error in unzip method " + e);
-                consoleToArea = "Please select any file(s)!";
+                consoleToArea = "Selected File(s) is not exist. Please select any file(s)!";
                 this.area();
             }
         });
