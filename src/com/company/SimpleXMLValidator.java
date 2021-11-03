@@ -153,7 +153,7 @@ public class SimpleXMLValidator extends Application {
 
                     replacedFilePath = (filePath.replace("/", "\\"));
                 }
-                System.out.println(replacedFilePath);
+                //System.out.println(replacedFilePath);
                 if (entry.isDirectory()) {
                     mkDir(new File(replacedFilePath));
                 }
@@ -162,6 +162,7 @@ public class SimpleXMLValidator extends Application {
                 if (!entry.isDirectory() & replacedFilePath.endsWith(".xml")) {
                     // if the entry is a file, extracts it
                     extractFile(zipIn, replacedFilePath);
+                    System.out.println("XML файл извлечён");
                     //tempFiles = replacedFilePath; // Найти где удаляется этот путь перед валидацией.
                 }
                 zipIn.closeEntry();

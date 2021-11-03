@@ -59,7 +59,7 @@ public class ValidatorController {
     }
 
     @FXML
-    void initialize() throws IOException {
+    void initialize(){
         SimpleXMLValidator.deleteDir(new File(SimpleXMLValidator.invalidFiles));
         Stage window = new Stage();                         // Инициализируем окно
         selectSchemaFile.setOnAction(actionEvent -> {       // задаем действие на кнопку selectSchemaFile
