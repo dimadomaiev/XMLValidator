@@ -112,12 +112,10 @@ public class SimpleXMLValidator extends Application {
             output = new BufferedWriter(new FileWriter(file));
             output.close();
             ValidatorController.consoleToArea = ("Invalid file !!! SAVED !!! to directory: " + invalidFiles + "\n");
+        } else {
+            ValidatorController.consoleToArea = "Zip file is not contains XML files...";
+            System.out.println("Zip file is not contains XML files...");
         }
-
-        //else {
-        //    ValidatorController.consoleToArea = "Zip file is not contains XML files...";
-        //    System.out.println("Zip file is not contains XML files...");
-        //}
 
     }
 
