@@ -1,12 +1,11 @@
 package com.company;
 
+import org.xml.sax.SAXException;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import org.xml.sax.SAXException;
-
 import javax.xml.XMLConstants;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
@@ -17,17 +16,20 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.DecimalFormat;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 public class SimpleXMLValidator extends Application {
     public static File schemaFile = null;
     public static File XMLFile = null;
+    public static List<File> pasForFiles;
     public static File pasToSelectedFiles = null;
     public static String tempFiles = "C:\\XMLValidator\\tempFiles\\";
     public static String invalidFiles = "C:\\XMLValidator\\invalidFiles\\";
-    public static String pathToFileFromNestedDir = null;
+    public static File pathToFileFromNestedDir = null;
     public static File fileToWrite = null;
+    public static String extractedFiles = "C:\\XMLValidator\\extractedFiles\\";
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -62,14 +64,13 @@ public class SimpleXMLValidator extends Application {
     public static void stageFile(Stage s) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(
-                "XML files (*.xml)", "*.xml", "*.zip"));// ,"*.7z","*.rar"));
-
+                "XML files (*.xml;*.zip)", "*.xml", "*.zip"));// ,"*.7z","*.rar"));
         if (pasToSelectedFiles != null) {
             fileChooser.setInitialDirectory(new File(pasToSelectedFiles.getParent()));
         }
-        ValidatorController.pasForFiles = fileChooser.showOpenMultipleDialog(s);
-        if (ValidatorController.pasForFiles != null) {
-            for (File pasForFile : ValidatorController.pasForFiles) {
+        pasForFiles = fileChooser.showOpenMultipleDialog(s);
+        if (pasForFiles != null) {
+            for (File pasForFile : pasForFiles) {
                 if (pasForFile != null) {
                     pasToSelectedFiles = new File(pasForFile.getAbsolutePath());
                     XMLFile = pasToSelectedFiles;
@@ -87,13 +88,15 @@ public class SimpleXMLValidator extends Application {
             Schema schema = schemaFactory.newSchema(mySchemaFile);
             Validator validator = schema.newValidator();
             validator.validate(myXMLFile);
-            ValidatorController.consoleToArea = (myXMLFile.getSystemId() + " - Size is: " + (new File(fileSize(absoluteFilePath.length()))) + " - IS VALID ");
-
+            ValidatorController.consoleToArea = (myXMLFile.getSystemId() + " - Size is: " +
+                    (new File(fileSize(absoluteFilePath.length()))) + " - IS VALID ");
         } catch (SAXException | IOException e) {
             if (absoluteSchemaPath == null || absoluteFilePath == null) {
-                System.out.println(ValidatorController.consoleToArea = "Please provide the path to the schema and/or XML file for validation!!!");
+                System.out.println(ValidatorController.consoleToArea =
+                        "Please provide the path to the schema and/or XML file for validation!!!");
             } else if (absoluteSchemaPath != null || absoluteFilePath != null) {
-                ValidatorController.consoleToArea = (myXMLFile.getSystemId() + " - Size is: " + (new File(fileSize(absoluteFilePath.length()))) + " - IS NOT VALID." + "\n" + "Reason: " + e);
+                ValidatorController.consoleToArea = (myXMLFile.getSystemId() + " - Size is: " +
+                        (new File(fileSize(absoluteFilePath.length()))) + " - IS NOT VALID." + "\n" + "Reason: " + e);
             }
         }
     }
@@ -102,13 +105,16 @@ public class SimpleXMLValidator extends Application {
         if (!Files.exists(Paths.get(invalidFiles))) {
             Files.createDirectories(Paths.get(invalidFiles));
         }
+        Writer output;
         if (ValidatorController.consoleToArea.contains("IS NOT VALID.")) {
-            Writer output;
             fileToWrite = new File(String.valueOf(files));
             output = new BufferedWriter(new FileWriter(files));
             output.close();
             ValidatorController.consoleToArea = ("Invalid file !!! SAVED !!! to directory: " + invalidFiles + "\n");
         }
+        fileToWrite = new File(String.valueOf(files));
+        output = new BufferedWriter(new FileWriter(files));
+        output.close();
     }
 
     static String fileSize(Long size) {
@@ -143,7 +149,6 @@ public class SimpleXMLValidator extends Application {
 
                     replacedFilePath = (filePath.replace("/", "\\"));
                 }
-                //System.out.println(replacedFilePath);
                 if (entry.isDirectory()) {
                     mkDir(new File(replacedFilePath));
                 }
@@ -152,7 +157,8 @@ public class SimpleXMLValidator extends Application {
                     // if the entry is a file, extracts it
                     extractFile(zipIn, replacedFilePath);
                     System.out.println("XML файл из вложенной директории извлечён");
-                    pathToFileFromNestedDir = replacedFilePath;
+                    pathToFileFromNestedDir = new File(replacedFilePath);
+                    writeFile(new File(extractedFiles + pathToFileFromNestedDir.getName()));
                 }
                 zipIn.closeEntry();
                 entry = zipIn.getNextEntry();

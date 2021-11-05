@@ -10,12 +10,10 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.List;
 import java.util.ResourceBundle;
 
 public class ValidatorController {
     public static String pasForSchema;
-    public static List<File> pasForFiles;
     public static String consoleToArea;
 
     @FXML
@@ -76,7 +74,7 @@ public class ValidatorController {
             this.area();
 
             try {
-                for (File pasForFile : pasForFiles) {                                                                   //Перебор выбранных XML файлов
+                for (File pasForFile : SimpleXMLValidator.pasForFiles) {                                                                   //Перебор выбранных XML файлов
                     if (pasForFile.getName().endsWith(".xml")) {                                                        //Проверка что файл имеет xml расширение
                         SimpleXMLValidator.XMLFile = new File(pasForFile.getAbsolutePath());                            //Присваиваем путь к файлу глобальной переменной для передачи на валидацию
                         SimpleXMLValidator.validate(SimpleXMLValidator.schemaFile, SimpleXMLValidator.XMLFile);         //Передаем файлы в метод валидации
@@ -108,13 +106,13 @@ public class ValidatorController {
                                     if (!consoleToArea.equals(toEqual)) {                                               //Проверяем что consoleToArea не равна предидущему значению
                                         this.area();                                                                    //Выводим результат валидации в текстовую область
                                     }
-                                } else if (SimpleXMLValidator.pathToFileFromNestedDir.endsWith(".xml")) {
+                                } else if (SimpleXMLValidator.pathToFileFromNestedDir.getName().endsWith(".xml")) {
                                     SimpleXMLValidator.validate(SimpleXMLValidator.schemaFile,
-                                            new File(SimpleXMLValidator.pathToFileFromNestedDir));
+                                            new File(String.valueOf(SimpleXMLValidator.pathToFileFromNestedDir)));
                                     this.area();
                                     String fromNestedDir = consoleToArea;                                               //Создаем переменную для устранения дублирования вывода в случае сохранения не валидного файла
                                     SimpleXMLValidator.fileToWrite = new File(
-                                            SimpleXMLValidator.pathToFileFromNestedDir);
+                                            String.valueOf(SimpleXMLValidator.pathToFileFromNestedDir));
                                     SimpleXMLValidator.writeFile(new File(SimpleXMLValidator.invalidFiles +
                                             SimpleXMLValidator.fileToWrite.getName()));                                 //Передаем файлы на сохранение  (нужно разобраться как сохранить только не валидные)
                                     if (!consoleToArea.equals(fromNestedDir)) {                                         //Проверяем что consoleToArea не равна предидущему значению
