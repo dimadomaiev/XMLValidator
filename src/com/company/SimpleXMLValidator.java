@@ -18,7 +18,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
 public class SimpleXMLValidator extends Application {
@@ -27,6 +26,8 @@ public class SimpleXMLValidator extends Application {
     public static File pasToSelectedFiles = null;
     public static String tempFiles = "C:\\XMLValidator\\tempFiles\\";
     public static String invalidFiles = "C:\\XMLValidator\\invalidFiles\\";
+    public static String pathToFileFromNestedDir = null;
+    public static File fileToWrite = null;
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -54,16 +55,14 @@ public class SimpleXMLValidator extends Application {
         if (selectedFile != null) {
             schemaFile = selectedFile;
             System.out.println();
-            //System.out.print("You have selected the file " + selectedFile.getAbsolutePath());
             ValidatorController.pasForSchema = selectedFile.getAbsolutePath();
-            System.out.println();
-            //System.out.println("schemaFile получает значение selectedFile = " + schemaFile);
         }
     }
 
     public static void stageFile(Stage s) {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("XML files (*.xml)", "*.xml", "*.zip"));// ,"*.7z","*.rar"));
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(
+                "XML files (*.xml)", "*.xml", "*.zip"));// ,"*.7z","*.rar"));
 
         if (pasToSelectedFiles != null) {
             fileChooser.setInitialDirectory(new File(pasToSelectedFiles.getParent()));
@@ -74,7 +73,6 @@ public class SimpleXMLValidator extends Application {
                 if (pasForFile != null) {
                     pasToSelectedFiles = new File(pasForFile.getAbsolutePath());
                     XMLFile = pasToSelectedFiles;
-                    //System.out.println("Путь к файлу после выбора архива " + pasForFile.getAbsolutePath());
                 }
             }
         }
@@ -100,23 +98,17 @@ public class SimpleXMLValidator extends Application {
         }
     }
 
-    public static void writeFile(String files) throws IOException {
+    public static void writeFile(File files) throws IOException {
         if (!Files.exists(Paths.get(invalidFiles))) {
             Files.createDirectories(Paths.get(invalidFiles));
         }
-        File file = new File(invalidFiles + XMLFile);
-        //if (file.getName().endsWith(".xml")) {
         if (ValidatorController.consoleToArea.contains("IS NOT VALID.")) {
             Writer output;
-            file = new File(files);
-            output = new BufferedWriter(new FileWriter(file));
+            fileToWrite = new File(String.valueOf(files));
+            output = new BufferedWriter(new FileWriter(files));
             output.close();
             ValidatorController.consoleToArea = ("Invalid file !!! SAVED !!! to directory: " + invalidFiles + "\n");
-        } else {
-            ValidatorController.consoleToArea = "Zip file is not contains XML files...";
-            System.out.println("Zip file is not contains XML files...");
         }
-
     }
 
     static String fileSize(Long size) {
@@ -155,13 +147,12 @@ public class SimpleXMLValidator extends Application {
                 if (entry.isDirectory()) {
                     mkDir(new File(replacedFilePath));
                 }
-                XMLFile = new File(replacedFilePath);
                 // if the entry is a directory, make the directory
                 if (!entry.isDirectory() & replacedFilePath.endsWith(".xml")) {
                     // if the entry is a file, extracts it
                     extractFile(zipIn, replacedFilePath);
-                    System.out.println("XML файл извлечён");
-                    //tempFiles = replacedFilePath; // Найти где удаляется этот путь перед валидацией.
+                    System.out.println("XML файл из вложенной директории извлечён");
+                    pathToFileFromNestedDir = replacedFilePath;
                 }
                 zipIn.closeEntry();
                 entry = zipIn.getNextEntry();
