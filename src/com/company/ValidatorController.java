@@ -7,20 +7,13 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
-import java.util.ResourceBundle;
 
 public class ValidatorController {
     public static String pasForSchema;
     public static String consoleToArea;
-
-    @FXML
-    private ResourceBundle resources;
-
-    @FXML
-    private URL location;
 
     @FXML
     private MenuItem linkToViki;
@@ -58,6 +51,7 @@ public class ValidatorController {
 
     @FXML
     void initialize() {
+        SimpleXMLValidator.deleteDir(new File(SimpleXMLValidator.tempFiles));
         SimpleXMLValidator.deleteDir(new File(SimpleXMLValidator.invalidFiles));                                        //Удаление не валидные файлов из временной папки при запуске программы
         Stage window = new Stage();                                                                                     // Инициализируем окно
         selectSchemaFile.setOnAction(actionEvent -> {                                                                   //Задаем действие на кнопку selectSchemaFile
@@ -70,19 +64,18 @@ public class ValidatorController {
             this.xfp();                                                                                                 // Задаем в промте поля путь к выбранному файлу
         });
         startValidation.setOnAction(actionEvent -> {
-            consoleToArea = ("\n" + "!!! STARTING VALIDATION !!!" + "\n");
+
+            consoleToArea = ("\n" + "-------------------------------------------------------------------------" + "\n");
             this.area();
 
             try {
-                for (File pasForFile : SimpleXMLValidator.pasForFiles) {                                                                   //Перебор выбранных XML файлов
+                for (File pasForFile : SimpleXMLValidator.pasForFiles) {                                                //Перебор выбранных XML файлов
                     if (pasForFile.getName().endsWith(".xml")) {                                                        //Проверка что файл имеет xml расширение
                         SimpleXMLValidator.XMLFile = new File(pasForFile.getAbsolutePath());                            //Присваиваем путь к файлу глобальной переменной для передачи на валидацию
                         SimpleXMLValidator.validate(SimpleXMLValidator.schemaFile, SimpleXMLValidator.XMLFile);         //Передаем файлы в метод валидации
                         this.area();                                                                                    //Выводим результат валидации в текстовую область
                         String toEqual = consoleToArea;                                                                 //Создаем переменную для устранения дублирования вывода в случае сохранения не валидного файла
-                        SimpleXMLValidator.fileToWrite = SimpleXMLValidator.XMLFile;
-                        SimpleXMLValidator.writeFile(new File(SimpleXMLValidator.invalidFiles +
-                                SimpleXMLValidator.fileToWrite.getName()));                                             //Передаем файлы на сохранение  (нужно разобраться как сохранить только не валидные)
+                        SimpleXMLValidator.writeFile(SimpleXMLValidator.XMLFile);                                       //Передаем файлы на сохранение  (нужно разобраться как сохранить только не валидные)
                         if (!consoleToArea.equals(toEqual)) {                                                           //Проверяем что consoleToArea не равна предидущему значению
                             this.area();                                                                                //Выводим результат валидации в текстовую область
                         }
@@ -102,20 +95,8 @@ public class ValidatorController {
                                     this.area();                                                                        //Выводим результат валидации в текстовую область
                                     String toEqual = consoleToArea;                                                     //Создаем переменную для устранения дублирования вывода в случае сохранения не валидного файла
                                     SimpleXMLValidator.writeFile(
-                                            new File(SimpleXMLValidator.invalidFiles + s));                    //Передаем файлы на сохранение  (нужно разобраться как сохранить только не валидные)
+                                            new File(SimpleXMLValidator.tempFiles + s));                       //Передаем файлы на сохранение  (нужно разобраться как сохранить только не валидные)
                                     if (!consoleToArea.equals(toEqual)) {                                               //Проверяем что consoleToArea не равна предидущему значению
-                                        this.area();                                                                    //Выводим результат валидации в текстовую область
-                                    }
-                                } else if (SimpleXMLValidator.pathToFileFromNestedDir.getName().endsWith(".xml")) {
-                                    SimpleXMLValidator.validate(SimpleXMLValidator.schemaFile,
-                                            new File(String.valueOf(SimpleXMLValidator.pathToFileFromNestedDir)));
-                                    this.area();
-                                    String fromNestedDir = consoleToArea;                                               //Создаем переменную для устранения дублирования вывода в случае сохранения не валидного файла
-                                    SimpleXMLValidator.fileToWrite = new File(
-                                            String.valueOf(SimpleXMLValidator.pathToFileFromNestedDir));
-                                    SimpleXMLValidator.writeFile(new File(SimpleXMLValidator.invalidFiles +
-                                            SimpleXMLValidator.fileToWrite.getName()));                                 //Передаем файлы на сохранение  (нужно разобраться как сохранить только не валидные)
-                                    if (!consoleToArea.equals(fromNestedDir)) {                                         //Проверяем что consoleToArea не равна предидущему значению
                                         this.area();                                                                    //Выводим результат валидации в текстовую область
                                     }
                                 }
@@ -131,5 +112,13 @@ public class ValidatorController {
                 this.area();                                                                                            //Выводим результат в текстовую область
             }
         });
+        linkToViki.setOnAction(actionEvent -> {
+                    try {
+                        Desktop.getDesktop().open(new File(SimpleXMLValidator.invalidFiles));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+        );
     }
 }

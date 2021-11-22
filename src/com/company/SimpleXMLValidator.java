@@ -6,6 +6,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+
 import javax.xml.XMLConstants;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
@@ -27,9 +28,6 @@ public class SimpleXMLValidator extends Application {
     public static File pasToSelectedFiles = null;
     public static String tempFiles = "C:\\XMLValidator\\tempFiles\\";
     public static String invalidFiles = "C:\\XMLValidator\\invalidFiles\\";
-    public static File pathToFileFromNestedDir = null;
-    public static File fileToWrite = null;
-    public static String extractedFiles = "C:\\XMLValidator\\extractedFiles\\";
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -94,7 +92,7 @@ public class SimpleXMLValidator extends Application {
             if (absoluteSchemaPath == null || absoluteFilePath == null) {
                 System.out.println(ValidatorController.consoleToArea =
                         "Please provide the path to the schema and/or XML file for validation!!!");
-            } else if (absoluteSchemaPath != null || absoluteFilePath != null) {
+            } else {
                 ValidatorController.consoleToArea = (myXMLFile.getSystemId() + " - Size is: " +
                         (new File(fileSize(absoluteFilePath.length()))) + " - IS NOT VALID." + "\n" + "Reason: " + e);
             }
@@ -105,16 +103,12 @@ public class SimpleXMLValidator extends Application {
         if (!Files.exists(Paths.get(invalidFiles))) {
             Files.createDirectories(Paths.get(invalidFiles));
         }
-        Writer output;
         if (ValidatorController.consoleToArea.contains("IS NOT VALID.")) {
-            fileToWrite = new File(String.valueOf(files));
-            output = new BufferedWriter(new FileWriter(files));
-            output.close();
+            copyFileUsingStream(files, new File(invalidFiles + files.getName()));
             ValidatorController.consoleToArea = ("Invalid file !!! SAVED !!! to directory: " + invalidFiles + "\n");
         }
-        fileToWrite = new File(String.valueOf(files));
-        output = new BufferedWriter(new FileWriter(files));
-        output.close();
+        copyFileUsingStream(files, new File(tempFiles + files.getName()));
+
     }
 
     static String fileSize(Long size) {
@@ -134,7 +128,6 @@ public class SimpleXMLValidator extends Application {
     }
 
     public static void unzip(String zipFilePath, String destDirectory) throws IOException {
-
         if (!Files.exists(Paths.get(destDirectory))) {
             Files.createDirectories(Paths.get(destDirectory));
         }
@@ -146,7 +139,6 @@ public class SimpleXMLValidator extends Application {
                 String filePath = destDirectory + entry.getName();
                 String replacedFilePath = filePath;
                 if (filePath.contains("/")) {
-
                     replacedFilePath = (filePath.replace("/", "\\"));
                 }
                 if (entry.isDirectory()) {
@@ -155,10 +147,10 @@ public class SimpleXMLValidator extends Application {
                 // if the entry is a directory, make the directory
                 if (!entry.isDirectory() & replacedFilePath.endsWith(".xml")) {
                     // if the entry is a file, extracts it
-                    extractFile(zipIn, replacedFilePath);
-                    System.out.println("XML файл из вложенной директории извлечён");
-                    pathToFileFromNestedDir = new File(replacedFilePath);
-                    writeFile(new File(extractedFiles + pathToFileFromNestedDir.getName()));
+                    extractFile(zipIn, tempFiles + entry.getName());
+                    File fileName = new File(entry.getName());
+                    System.out.println("XML файл ("+ fileName +") извлечён.");
+                    copyFileUsingStream(new File(replacedFilePath), new File(tempFiles + fileName.getName()));
                 }
                 zipIn.closeEntry();
                 entry = zipIn.getNextEntry();
@@ -170,6 +162,7 @@ public class SimpleXMLValidator extends Application {
     }
 
     private static void extractFile(ZipInputStream zipIn, String filePath) throws IOException {
+        mkDir(new File(new File(filePath).getParent()));
         BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(filePath));
         byte[] bytesIn = new byte[8192];
         int read;
@@ -177,6 +170,19 @@ public class SimpleXMLValidator extends Application {
             bos.write(bytesIn, 0, read);
         }
         bos.close();
+    }
+
+    public static void copyFileUsingStream(File source, File dest) throws IOException {
+        mkDir(new File(dest.getParent()));
+        if (!source.equals(dest)) {
+            try (InputStream is = new FileInputStream(source); OutputStream os = new FileOutputStream(dest)) {
+                byte[] buffer = new byte[1024];
+                int length;
+                while ((length = is.read(buffer)) > 0) {
+                    os.write(buffer, 0, length);
+                }
+            }
+        }
     }
 
     static void mkDir(File file) {
