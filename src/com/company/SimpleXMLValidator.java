@@ -149,7 +149,7 @@ public class SimpleXMLValidator extends Application {
                     // if the entry is a file, extracts it
                     extractFile(zipIn, tempFiles + entry.getName());
                     File fileName = new File(entry.getName());
-                    System.out.println("XML файл ("+ fileName +") извлечён.");
+                    System.out.println("XML файл (" + fileName + ") извлечён.");
                     copyFileUsingStream(new File(replacedFilePath), new File(tempFiles + fileName.getName()));
                 }
                 zipIn.closeEntry();
