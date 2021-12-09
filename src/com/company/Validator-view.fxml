@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
@@ -12,7 +13,6 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
 <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/1.8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.company.ValidatorController">
@@ -23,7 +23,7 @@
                     <items>
                   <MenuItem fx:id="invalidFilesWindow" mnemonicParsing="false" text="Invalid Files" />
                   <SeparatorMenuItem mnemonicParsing="false" />
-                        <MenuItem fx:id="link" mnemonicParsing="false" text="Wili Link" />
+                        <MenuItem mnemonicParsing="false" text="Wiki Link" />
                     </items>
                 </Menu>
             </menus>
@@ -33,13 +33,13 @@
           <Tab text="Local Tab">
                <content>
                     <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0">
-                        <TextField fx:id="schemaFilePas" layoutX="180.0" layoutY="23.0" prefHeight="26.0" prefWidth="571.0" promptText="Указать путь к файлу схем. К примеру fcsExport.xsd" />
-                        <TextField layoutX="180.0" layoutY="60.0" prefHeight="26.0" prefWidth="571.0" promptText="Указать путь к файлу .xml для валидации по схеме .xsd" fx:id="xmlFilePas" />
+                        <TextField fx:id="schemaFilePath" layoutX="180.0" layoutY="23.0" prefHeight="26.0" prefWidth="571.0" promptText="Указать путь к файлу схем. К примеру fcsExport.xsd" />
+                        <TextField layoutX="180.0" layoutY="60.0" prefHeight="26.0" prefWidth="571.0" promptText="Указать путь к файлу .xml для валидации по схеме .xsd" fx:id="xmlFilePath" />
                         <Text layoutX="20.0" layoutY="40.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Схемы" />
                         <Text layoutX="20.0" layoutY="80.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Файл" />
                         <Button fx:id="startValidation" layoutX="400.0" layoutY="110.0" mnemonicParsing="false" onAction="#initialize" text="Start Validation" />
-                        <Button fx:id="selectSchemaFile" layoutX="65.0" layoutY="23.0" mnemonicParsing="false" text="Select Schemes" />
-                        <Button fx:id="selectXMLFile" layoutX="65.0" layoutY="60.0" mnemonicParsing="false" text="Select XML File" />
+                        <Button fx:id="selectSchemaFile" layoutX="65.0" layoutY="23.0" mnemonicParsing="false" prefWidth="100.0" text="Select Schemes" />
+                        <Button fx:id="selectXMLFile" layoutX="65.0" layoutY="60.0" mnemonicParsing="false" prefWidth="100.0" text="Select the Files" />
                     </AnchorPane>
                </content>
             </Tab>
@@ -47,24 +47,19 @@
                <content>
                   <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="450.0" prefWidth="900.0">
                      <children>
-                        <TextField fx:id="FTPURL" layoutX="460.0" layoutY="55.0" prefHeight="26.0" prefWidth="415.0" promptText="Или указать URL FTP. Пример - &quot;ftp://login:pass@environment/dir&quot;" />
                         <Text layoutX="20.0" layoutY="40.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Схемы" />
-                        <TextField fx:id="FTPSchemaFilePas" layoutX="180.0" layoutY="23.0" prefHeight="26.0" prefWidth="695.0" promptText="Указать путь к файлу схем. К примеру fcsExport.xsd" />
-                        <Button fx:id="FTPStartValidation" layoutX="400.0" layoutY="110.0" mnemonicParsing="false" onAction="#initialize" text="Start Validation" />
-                        <Button fx:id="FTPSelectSchemaFile" layoutX="65.0" layoutY="23.0" mnemonicParsing="false" text="Select Schemes" />
-                        <RadioButton fx:id="FTPEIS1" layoutX="20.0" layoutY="60.0" mnemonicParsing="false" text="EIS1" />
-                        <RadioButton fx:id="FTPEIS2" layoutX="80.0" layoutY="60.0" mnemonicParsing="false" text="EIS2" />
-                        <RadioButton fx:id="FTPEIS3" layoutX="140.0" layoutY="60.0" mnemonicParsing="false" text="EIS3" />
-                        <RadioButton fx:id="FTPEIS4" layoutX="260.0" layoutY="60.0" mnemonicParsing="false" text="EIS4" />
-                        <RadioButton fx:id="FTPEIS5" layoutX="200.0" layoutY="60.0" mnemonicParsing="false" text="EIS5" />
-                        <RadioButton fx:id="FTPEIS6" layoutX="320.0" layoutY="60.0" mnemonicParsing="false" text="EIS6" />
-                        <RadioButton fx:id="FTPEIS7" layoutX="380.0" layoutY="60.0" mnemonicParsing="false" text="EIS7" />
-                        <Text fill="#000000ae" fontSmoothingType="LCD" layoutX="435.0" layoutY="73.0" strokeType="OUTSIDE" strokeWidth="0.0" text="||" textAlignment="CENTER">
-                           <font>
-                              <Font size="18.0" />
-                           </font>
-                        </Text>
-                        <TextField fx:id="FTPManualDir" layoutX="21.0" layoutY="84.0" prefHeight="26.0" prefWidth="340.0" promptText="Указать папку для валидации на ФТП. (Если необходимо)" />
+                        <Button fx:id="ftpSelectSchemaFile" layoutX="65.0" layoutY="23.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="100.0" text="Select Schemes" />
+                        <TextField fx:id="ftpSchemaFilePath" layoutX="180.0" layoutY="23.0" prefHeight="26.0" prefWidth="695.0" promptText="Path to the schema file. For example fcsExport.xsd" />
+                        <Text layoutX="22.0" layoutY="73.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Стенд" />
+                        <ChoiceBox fx:id="environment" layoutX="65.0" layoutY="56.0" prefHeight="25.0" prefWidth="100.0" snapToPixel="false" />
+                        <Text fx:id="ftpBFText" layoutX="180.0" layoutY="73.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Корневой каталог" />
+                        <ChoiceBox fx:id="ftpBaseFolder" layoutX="290.0" layoutY="56.0" prefHeight="25.0" prefWidth="100.0" snapToPixel="false" />
+                        <TextField fx:id="ftpManualDir" layoutX="401.0" layoutY="55.0" prefHeight="26.0" prefWidth="475.0" promptText="Указать конечный каталог FTP." />
+                        <TextField fx:id="ftpLogin" layoutX="180.0" layoutY="55.0" prefHeight="26.0" prefWidth="80.0" promptText="Login" visible="false" />
+                        <PasswordField fx:id="ftpPassword" layoutX="270.0" layoutY="55.0" prefHeight="26.0" prefWidth="80.0" promptText="Pass" visible="false" />
+                        <TextField fx:id="ftpOtherURL" layoutX="360.0" layoutY="55.0" prefHeight="26.0" prefWidth="218.0" promptText="FTP Environment" visible="false" />
+                        <TextField fx:id="ftpOtherBaseFolder" layoutX="587.0" layoutY="56.0" prefHeight="26.0" prefWidth="288.0" promptText="End folder other FTP" visible="false" />
+                        <Button fx:id="ftpStartValidation" layoutX="400.0" layoutY="110.0" mnemonicParsing="false" onAction="#initialize" text="Start Validation" />
                      </children>
                   </AnchorPane>
                </content>
