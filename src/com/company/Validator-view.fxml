@@ -21,55 +21,51 @@
             <menus>
                 <Menu mnemonicParsing="false" text="Help">
                     <items>
-                  <MenuItem fx:id="invalidFilesWindow" mnemonicParsing="false" text="Invalid Files" />
-                  <SeparatorMenuItem mnemonicParsing="false" />
+                        <MenuItem fx:id="invalidFilesWindow" mnemonicParsing="false" text="Invalid Files" />
+                        <SeparatorMenuItem mnemonicParsing="false" />
                         <MenuItem mnemonicParsing="false" text="Wiki Link" />
                     </items>
                 </Menu>
             </menus>
         </MenuBar>
-      <TabPane prefHeight="170.0" prefWidth="900.0" tabClosingPolicy="UNAVAILABLE">
-        <tabs>
-          <Tab text="Local Tab">
-               <content>
-                    <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0">
-                        <TextField fx:id="schemaFilePath" layoutX="180.0" layoutY="23.0" prefHeight="26.0" prefWidth="571.0" promptText="Указать путь к файлу схем. К примеру fcsExport.xsd" />
-                        <TextField layoutX="180.0" layoutY="60.0" prefHeight="26.0" prefWidth="571.0" promptText="Указать путь к файлу .xml для валидации по схеме .xsd" fx:id="xmlFilePath" />
-                        <Text layoutX="20.0" layoutY="40.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Схемы" />
-                        <Text layoutX="20.0" layoutY="80.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Файл" />
-                        <Button fx:id="startValidation" layoutX="400.0" layoutY="110.0" mnemonicParsing="false" onAction="#initialize" text="Start Validation" />
-                        <Button fx:id="selectSchemaFile" layoutX="65.0" layoutY="23.0" mnemonicParsing="false" prefWidth="100.0" text="Select Schemes" />
-                        <Button fx:id="selectXMLFile" layoutX="65.0" layoutY="60.0" mnemonicParsing="false" prefWidth="100.0" text="Select the Files" />
-                    </AnchorPane>
-               </content>
-            </Tab>
-          <Tab text="FTP Tab">
-               <content>
-                  <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="450.0" prefWidth="900.0">
-                     <children>
-                        <Text layoutX="20.0" layoutY="40.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Схемы" />
-                        <Button fx:id="ftpSelectSchemaFile" layoutX="65.0" layoutY="23.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="100.0" text="Select Schemes" />
-                        <TextField fx:id="ftpSchemaFilePath" layoutX="180.0" layoutY="23.0" prefHeight="26.0" prefWidth="695.0" promptText="Path to the schema file. For example fcsExport.xsd" />
-                        <Text layoutX="22.0" layoutY="73.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Стенд" />
-                        <ChoiceBox fx:id="environment" layoutX="65.0" layoutY="56.0" prefHeight="25.0" prefWidth="100.0" snapToPixel="false" />
-                        <Text fx:id="ftpBFText" layoutX="180.0" layoutY="73.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Корневой каталог" />
-                        <ChoiceBox fx:id="ftpBaseFolder" layoutX="290.0" layoutY="56.0" prefHeight="25.0" prefWidth="100.0" snapToPixel="false" />
-                        <TextField fx:id="ftpManualDir" layoutX="401.0" layoutY="55.0" prefHeight="26.0" prefWidth="475.0" promptText="Указать конечный каталог FTP." />
-                        <TextField fx:id="ftpLogin" layoutX="180.0" layoutY="55.0" prefHeight="26.0" prefWidth="80.0" promptText="Login" visible="false" />
-                        <PasswordField fx:id="ftpPassword" layoutX="270.0" layoutY="55.0" prefHeight="26.0" prefWidth="80.0" promptText="Pass" visible="false" />
-                        <TextField fx:id="ftpOtherURL" layoutX="360.0" layoutY="55.0" prefHeight="26.0" prefWidth="218.0" promptText="FTP Environment" visible="false" />
-                        <TextField fx:id="ftpOtherBaseFolder" layoutX="587.0" layoutY="56.0" prefHeight="26.0" prefWidth="288.0" promptText="End folder other FTP" visible="false" />
-                        <Button fx:id="ftpStartValidation" layoutX="400.0" layoutY="110.0" mnemonicParsing="false" onAction="#initialize" text="Start Validation" />
-                     </children>
-                  </AnchorPane>
-               </content>
-            </Tab>
-        </tabs>
-      </TabPane>
-      <AnchorPane prefHeight="404.0" prefWidth="900.0">
-         <children>
-               <TextArea fx:id="console" layoutX="10.0" layoutY="10.0" prefHeight="390.0" prefWidth="880.0" />
-         </children>
-      </AnchorPane>
+        <TabPane prefHeight="80.0" prefWidth="900.0" tabClosingPolicy="UNAVAILABLE">
+            <tabs>
+                <Tab fx:id="localTab" text="Local Tab">
+                    <content>
+                        <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="51.0" prefWidth="882.0">
+                            <Text layoutX="10.0" layoutY="32.0" strokeType="OUTSIDE" strokeWidth="0.0" text="A file(s)" />
+                            <Button fx:id="selectXMLFile" layoutX="80.0" layoutY="15.0" mnemonicParsing="false" prefWidth="100.0" text="Select a File(s)" />
+                            <TextField layoutX="189.0" layoutY="15.0" prefHeight="26.0" prefWidth="680.0" promptText="Указать путь к файлу .xml для валидации по схеме .xsd" fx:id="xmlFilePath" />
+                        </AnchorPane>
+                    </content>
+                </Tab>
+                <Tab fx:id="ftpTab" text="FTP Tab">
+                    <content>
+                        <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="450.0" prefWidth="900.0">
+                            <children>
+                                <Text layoutX="10.0" layoutY="32.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Environment" />
+                                <ChoiceBox fx:id="environment" layoutX="80.0" layoutY="15.0" prefHeight="25.0" prefWidth="100.0" snapToPixel="false" />
+                                <Text fx:id="ftpBaseFolderText" layoutX="190.0" layoutY="32.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Base folder" />
+                                <ChoiceBox fx:id="ftpBaseFolder" layoutX="255.0" layoutY="15.0" prefHeight="25.0" prefWidth="100.0" snapToPixel="false" />
+                                <TextField fx:id="ftpManualDir" layoutX="370.0" layoutY="15.0" prefHeight="25.0" prefWidth="500.0" promptText="Specify the path from Base folder to the folder for validate" />
+                                <TextField fx:id="ftpLogin" layoutX="191.0" layoutY="15.0" prefHeight="25.0" prefWidth="80.0" promptText="Login" visible="false" />
+                                <PasswordField fx:id="ftpPassword" layoutX="280.0" layoutY="15.0" prefHeight="25.0" prefWidth="80.0" promptText="Pass" visible="false" />
+                                <TextField fx:id="ftpOtherURL" layoutX="365.0" layoutY="15.0" prefHeight="25.0" prefWidth="220.0" promptText="FTP Environment" visible="false" />
+                                <TextField fx:id="ftpOtherBaseFolder" layoutX="595.0" layoutY="15.0" prefHeight="25.0" prefWidth="275.0" promptText="End folder other FTP" visible="false" />
+                            </children>
+                        </AnchorPane>
+                    </content>
+                </Tab>
+            </tabs>
+        </TabPane>
+        <AnchorPane prefHeight="404.0" prefWidth="889.0">
+            <children>
+                <Text layoutX="10.0" layoutY="30.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Schemes" />
+                <Button fx:id="selectSchemaFile" layoutX="80.0" layoutY="10.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="100.0" text="Select Schemes" />
+                <TextField fx:id="schemaFilePath" layoutX="190.0" layoutY="10.0" prefHeight="25.0" prefWidth="680.0" promptText="Указать путь к файлу схем. К примеру fcsExport.xsd" />
+                <Button fx:id="startValidation" layoutX="400.0" layoutY="50.0" mnemonicParsing="false" onAction="#initialize" text="Start Validation" />
+                <TextArea fx:id="console" layoutY="100.0" prefHeight="400.0" prefWidth="900.0" />
+            </children>
+        </AnchorPane>
     </children>
 </VBox>
