@@ -1,6 +1,7 @@
 <component name="libraryTable">
-  <library name="javafx-swt">
+  <library name="commons-net-3.6">
     <CLASSES>
+      <root url="jar://$PATH_TO_FX$/commons-net-3.6.jar!/" />
       <root url="jar://$PATH_TO_FX$/javafx-swt.jar!/" />
       <root url="jar://$PATH_TO_FX$/javafx.base.jar!/" />
       <root url="jar://$PATH_TO_FX$/javafx.controls.jar!/" />

@@ -21,6 +21,7 @@ import javax.xml.validation.Validator;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.Locale;
 
 public class ValidatorController {
     public static String pathForSchema;
@@ -61,8 +62,8 @@ public class ValidatorController {
     @FXML
     private TextField schemaFilePath;
 
-    void setPromptSchemaFilePath() {
-        schemaFilePath.setPromptText(pathForSchema);                                                                      //Устанавливаем путь к файлу в поле после выбора схемы
+    void setPromptSchemaFilePath(File file) {
+        schemaFilePath.setPromptText(String.valueOf(file));                                                                      //Устанавливаем путь к файлу в поле после выбора схемы
     }
 
     @FXML
@@ -122,7 +123,7 @@ public class ValidatorController {
 
         selectSchemaFile.setOnAction(actionEvent -> {                                                                   //Задаем действие на кнопку selectSchemaFile
             SimpleXMLValidator.stageSchema(window);                                                                     //Вызываем метод выбора файла
-            this.setPromptSchemaFilePath();                                                                             //Задаем в промте поля путь к выбранному файлу
+            this.setPromptSchemaFilePath(SimpleXMLValidator.schemaFile);                                                                             //Задаем в промте поля путь к выбранному файлу
         });
 
         selectXMLFile.setOnAction(actionEvent -> {                                                                      // Задаем действие на кнопку selectXMLFile
@@ -132,11 +133,21 @@ public class ValidatorController {
 //----------------------------------------------------------------------------------------------------------------------
         startValidation.setOnAction(actionEvent -> {
             if (SimpleXMLValidator.schemaFile == null) {
-                System.out.println(consoleToArea = "Please select schema to validate file(s)!");
+                System.out.println(consoleToArea = "Please select schema to validate file(s)!\n");
                 this.consoleArea();
+                this.setPromptSchemaFilePath(new File(consoleToArea.toUpperCase(Locale.ROOT)));
+                //this.setPromptXMLFilePath(new File(consoleToArea.toUpperCase(Locale.ROOT)));
                 return;
             }
+
             if (localTab.isSelected()) {
+                if (SimpleXMLValidator.pathForFiles == null) {
+                    System.out.println(consoleToArea = "You should specify file(s) for validate.\n");
+                    this.consoleArea();
+                    this.setPromptXMLFilePath(new File(consoleToArea.toUpperCase(Locale.ROOT)));
+                    return;
+                }
+
                 for (File pathForFile : SimpleXMLValidator.pathForFiles) {
                     try {
                         SimpleXMLValidator.copyFileUsingStream(pathForFile, new File(SimpleXMLValidator.tempFiles + pathForFile.getName()));
@@ -155,7 +166,7 @@ public class ValidatorController {
                     }
                 }
                 SimpleXMLValidator.selectTempFTPFiles();
-                this.setPromptXMLFilePath(new File(SimpleXMLValidator.tempFiles));
+                this.setPromptXMLFilePath(new File(String.valueOf(SimpleXMLValidator.pathForFiles)));
 
                 for (File pathForFile : SimpleXMLValidator.pathForFiles) {
                     if (pathForFile.getName().endsWith(".xml")) {
@@ -169,21 +180,26 @@ public class ValidatorController {
             }
 //----------------------------------------------------------------------------------------------------------------------
             if (ftpTab.isSelected()) {
-                SimpleXMLValidator.manualDir = ftpManualDir.getText();
-                if (SimpleXMLValidator.selectedEnvironment.equals("Other")) {
-                    SimpleXMLValidator.otherFTPManualDir = otherFTPManualDir.getText();
-                    SimpleXMLValidator.manualDir = otherFTPManualDir.getText();
-                    SimpleXMLValidator.ftpOther = ftpOtherURL.getText();
-                }
-
-                consoleToArea = ("\n" + "Connect... to FTP and Downloading files ... " + "\n");
-                this.consoleArea();
-
                 if (SimpleXMLValidator.selectedEnvironment == null) {
                     System.out.println(consoleToArea = "Please specify environment ! ...");
                     this.consoleArea();
                     return;
                 }
+
+                SimpleXMLValidator.manualDir = ftpManualDir.getText();
+                if (SimpleXMLValidator.selectedEnvironment.equals("Other")) {
+                    SimpleXMLValidator.otherFTPManualDir = otherFTPManualDir.getText();
+                    SimpleXMLValidator.manualDir = otherFTPManualDir.getText();
+                    SimpleXMLValidator.ftpOther = ftpOtherURL.getText();
+                    if (!(ftpLogin.getText().equals(""))) {
+                        SimpleXMLValidator.username = ftpLogin.getText();
+                    }
+                    if (!(ftpPassword.getText().equals(""))) {
+                        SimpleXMLValidator.password = ftpPassword.getText();
+                    }
+                }
+
+
 
                 if (SimpleXMLValidator.ftpBaseFolder == null & !SimpleXMLValidator.selectedEnvironment.equals("Other")) {
                     System.out.println(consoleToArea = "Please specify base folder of environment ! ...");
@@ -203,7 +219,10 @@ public class ValidatorController {
                     SimpleXMLValidator.ftpClient();
                 } catch (IOException e) {
                     e.printStackTrace();
-                    System.out.println("Что-то с подключением к FTP. Error - " + e);
+                    System.out.println("Problem with connection to FTP. Error - " + e);
+                    System.out.println(consoleToArea = "Please specify environment ! ... Or check VPN connection... " );
+                    this.consoleArea();
+                    return;
                 }
 
                 consoleToArea = ("\n" + "Unzip loaded files ..." + "\n");
