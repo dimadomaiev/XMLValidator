@@ -23,7 +23,9 @@
                     <items>
                         <MenuItem fx:id="invalidFilesWindow" mnemonicParsing="false" text="Invalid Files" />
                         <SeparatorMenuItem mnemonicParsing="false" />
-                        <MenuItem mnemonicParsing="false" text="Wiki Link" />
+                        <MenuItem fx:id="linkToWiki" mnemonicParsing="false" text="Wiki Link" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem fx:id="clearConsole" mnemonicParsing="false" text="Clear console and tempFolder" />
                     </items>
                 </Menu>
             </menus>
@@ -35,7 +37,7 @@
                         <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="51.0" prefWidth="882.0">
                             <Text layoutX="10.0" layoutY="32.0" strokeType="OUTSIDE" strokeWidth="0.0" text="A file(s)" />
                             <Button fx:id="selectXMLFile" layoutX="80.0" layoutY="15.0" mnemonicParsing="false" prefWidth="100.0" text="Select a File(s)" />
-                            <TextField layoutX="189.0" layoutY="15.0" prefHeight="26.0" prefWidth="680.0" promptText="Указать путь к файлу .xml для валидации по схеме .xsd" fx:id="xmlFilePath" />
+                            <TextField layoutX="189.0" layoutY="15.0" prefHeight="26.0" prefWidth="680.0" promptText="Specify the path to &quot;.xml&quot; or &quot;.zip&quot; file(s) for validation according to the .xsd schema." fx:id="xmlFilePath" />
                         </AnchorPane>
                     </content>
                 </Tab>
@@ -47,7 +49,7 @@
                                 <ChoiceBox fx:id="environment" layoutX="80.0" layoutY="15.0" prefHeight="25.0" prefWidth="100.0" snapToPixel="false" />
                                 <Text fx:id="ftpBaseFolderText" layoutX="190.0" layoutY="32.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Base folder" />
                                 <ChoiceBox fx:id="ftpBaseFolder" layoutX="255.0" layoutY="15.0" prefHeight="25.0" prefWidth="100.0" snapToPixel="false" />
-                                <TextField fx:id="ftpManualDir" layoutX="370.0" layoutY="15.0" prefHeight="25.0" prefWidth="500.0" promptText="Specify the path from Base folder to the folder for validate" />
+                                <TextField fx:id="ftpManualDir" layoutX="370.0" layoutY="15.0" prefHeight="25.0" prefWidth="500.0" promptText="Specify the path from the Base folder to the folder for validate." />
                                 <TextField fx:id="ftpLogin" layoutX="191.0" layoutY="15.0" prefHeight="25.0" prefWidth="80.0" promptText="Login" visible="false" />
                                 <PasswordField fx:id="ftpPassword" layoutX="280.0" layoutY="15.0" prefHeight="25.0" prefWidth="80.0" promptText="Pass" visible="false" />
                                 <TextField fx:id="ftpOtherURL" layoutX="365.0" layoutY="15.0" prefHeight="25.0" prefWidth="220.0" promptText="FTP Environment" visible="false" />
@@ -62,7 +64,7 @@
             <children>
                 <Text layoutX="10.0" layoutY="30.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Schemes" />
                 <Button fx:id="selectSchemaFile" layoutX="80.0" layoutY="10.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="100.0" text="Select Schemes" />
-                <TextField fx:id="schemaFilePath" layoutX="190.0" layoutY="10.0" prefHeight="25.0" prefWidth="680.0" promptText="Указать путь к файлу схем. К примеру fcsExport.xsd" />
+                <TextField fx:id="schemaFilePath" layoutX="190.0" layoutY="10.0" prefHeight="25.0" prefWidth="680.0" promptText="Specify the path to the schema file. For example fcsExport.xsd" />
                 <Button fx:id="startValidation" layoutX="400.0" layoutY="50.0" mnemonicParsing="false" onAction="#initialize" text="Start Validation" />
                 <TextArea fx:id="console" layoutY="100.0" prefHeight="400.0" prefWidth="900.0" />
             </children>

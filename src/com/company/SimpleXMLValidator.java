@@ -3,19 +3,12 @@ package com.company;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
-import org.xml.sax.SAXException;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
-import javax.xml.XMLConstants;
-import javax.xml.transform.Source;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
-import javax.xml.validation.Validator;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -92,8 +85,7 @@ public class SimpleXMLValidator extends Application {
     }
 
     public static void ftpClient() throws IOException {
-        consoleToArea = ("\n" + "Connect... to FTP and Downloading files ... " + "\n");
-        //ValidatorController.printToArea();
+        System.out.println ("\n" + "Connect... to FTP and Downloading files ... " + "\n");
         long startTime = System.nanoTime();
         FTPClient ftpClient = new FTPClient();
         String env = null;
@@ -117,7 +109,7 @@ public class SimpleXMLValidator extends Application {
         ftpClient.connect(env);
         System.out.println("Connected.\nLogin...");
         ftpClient.login("free", "free");
-        System.out.println("Logined.");
+        System.out.println("Logged.");
         ftpClient.enterLocalPassiveMode();
         ftpClient.type(FTP.BINARY_FILE_TYPE);
         ftpClient.setControlEncoding("UTF-8");
@@ -132,15 +124,19 @@ public class SimpleXMLValidator extends Application {
             if (key.equals(ftpBaseFolder)) {
                 baseFolder = baseFolders.get(key);
             }
+            if(!(ftpOtherBaseFolder == null)) {
+                baseFolder = ftpOtherBaseFolder;
+            }
         }
 
         FTPFile[] files;
         FTPFile[] dirs = ftpClient.listDirectories(baseFolder);
-        if (baseFolder == null) {
-            dirs = ftpClient.listDirectories(ftpOtherBaseFolder);
-            baseFolder = ftpOtherBaseFolder;
-        }
+        //if (baseFolder == null) {
+        //    dirs = ftpClient.listDirectories(ftpOtherBaseFolder);
+        //    baseFolder = ftpOtherBaseFolder;
+        //}
 
+        assert baseFolder != null;
         String fasPrefix = (baseFolder.equals("fcs_fas/")) ? "/currMonth" : "";                                              //Определяет, если выбрана проверка ФАС/ОВК, то добавляет каталог текущего месяца
         //в подкаталог "currMonth".
         String remotePath;
@@ -148,16 +144,14 @@ public class SimpleXMLValidator extends Application {
             for (FTPFile dir : dirs) {
                 System.out.println("Dir name - " + dir.getName() + "\n");
                 remotePath = dir.getName();
-                downloadFolder(ftpClient, baseFolder + remotePath, tempFiles);
-                //files = ftpClient.listFiles(baseFolder + dir.getName() + fasPrefix);
-                //parseFTPFiles(ftpClient, dir.getName(), files, baseFolder, fasPrefix);
+                ftpFileLoader(ftpClient, baseFolder + remotePath, tempFiles);
             }
         }
         if (selectedEnvironment.equals("Other")) {
             for (FTPFile dir : dirs) {
                 System.out.println("Dir name - " + dir.getName() + "\n");
                 remotePath = dir.getName();
-                downloadFolder(ftpClient, baseFolder + remotePath, tempFiles);
+                ftpFileLoader(ftpClient, baseFolder + remotePath, tempFiles);
             }
         } else {
             files = ftpClient.listFiles(baseFolder + manualDir + fasPrefix);
@@ -185,8 +179,7 @@ public class SimpleXMLValidator extends Application {
     }
 
     public static void selectTempFTPFiles() {
-        consoleToArea = ("\n" + "Get loaded files ..." + "\n");
-        //ValidatorController.printToArea();
+        System.out.println(consoleToArea = ("\n" + "Get loaded files ..." + "\n"));
         File folder = new File("C:\\XMLValidator\\tempFiles\\");
         File[] listOfFiles = folder.listFiles();
 
@@ -198,87 +191,8 @@ public class SimpleXMLValidator extends Application {
         }
         pathForFiles = Arrays.asList(listOfFiles);
     }
-
-    static void validator() {
-        consoleToArea = ("\n" + "-------------------------------------------------------------------------" + "\n");
-        //ValidatorController.appendText(consoleToArea);
-        try {
-            for (File pathForFile : pathForFiles) {                                                //Перебор выбранных XML файлов
-                if (pathForFile.getName().endsWith(".xml")) {                                                        //Проверка что файл имеет xml расширение
-                    xmlFile = new File(pathForFile.getAbsolutePath());                            //Присваиваем путь к файлу глобальной переменной для передачи на валидацию
-                    validate(schemaFile, xmlFile);         //Передаем файлы в метод валидации
-                    //ValidatorController.printToArea();                                                                                    //Выводим результат валидации в текстовую область
-                    //String toEqual =
-                    //ValidatorController.consoleToArea;                                                                 //Создаем переменную для устранения дублирования вывода в случае сохранения не валидного файла
-                    writeFile(xmlFile);                                       //Передаем файлы на сохранение  (нужно разобраться как сохранить только не валидные)
-                    //if (!ValidatorController.consoleToArea.equals(toEqual)) {                                                           //Проверяем что consoleToArea не равна предидущему значению
-                    //ValidatorController.printToArea();                                                                                //Выводим результат валидации в текстовую область
-                    //}
-                }
-                if (pathForFile.getName().endsWith(".zip")) {                                                        //Проверка, если файл является архивом
-                    xmlFile = new File(pathForFile.getAbsolutePath());                            //Присваиваем путь к файлу глобальной переменной для передачи на валидацию
-                    System.out.println("Start unzipping " + pathForFile.getName());
-                    //ValidatorController.printToArea();
-                    unzip(pathForFile.getAbsolutePath(), tempFiles);           //Передаем архив на распаковку
-                    File file = new File(tempFiles);                                             //Создаемы ссылку на распакованный файл
-                    String[] filesList;                                                                             //Массив строк для ссылок на файлы
-                    if (file.isDirectory()) {                                                                       //Проверяем является ли ссылка директорией
-                        filesList = file.list();                                                                    //Присваиваем списку файлы из временной директории
-                        assert filesList != null;                                                                   //Проверка списка на null
-                        for (String s : filesList) {                                                                //Перебор списка файлов
-                            if (s.endsWith(".xml")) {
-                                System.out.println("Validate - " + s);
-                                validate(schemaFile,
-                                        new File(tempFiles + s));                       //Передаем разархивированные файлы в метод валидации
-                                //ValidatorController.printToArea();                                                                        //Выводим результат валидации в текстовую область
-                                //String toEqual = ValidatorController.consoleToArea;                                                     //Создаем переменную для устранения дублирования вывода в случае сохранения не валидного файла
-                                if (consoleToArea.contains("IS NOT VALID.")) {
-                                    if (!Files.exists(Paths.get(invalidFiles))) {
-                                        Files.createDirectories(Paths.get(invalidFiles));
-                                    }
-                                    copyFileUsingStream(new File(tempFiles + s), new File(invalidFiles + s));
-                                    consoleToArea = ("Invalid file !!! SAVED !!! to directory: " + invalidFiles + "\n");
-                                }
-                                //if (!ValidatorController.consoleToArea.equals(toEqual)) {                                               //Проверяем что consoleToArea не равна предидущему значению
-                                // ValidatorController.printToArea();                                                                    //Выводим результат валидации в текстовую область
-                                //}
-                            }
-                        }
-                    }
-                }
-            }
-        } catch (IOException | NullPointerException e) {                                                            //Отлавливаем ошибки в случае отсутствия пути к файлам или выбора архива не содержащего xml файлов
-            e.printStackTrace();                                                                                    //Вывод ошибки в консоль
-            System.out.println("Error in unzip method " + e);                                                       //Вывод в консоль сообщения где возникла ошибка
-            consoleToArea = "Selected File(s) is not exist. Please select any file(s)!";                            //Присваиваем глоб.перем. сообщение для вывода в текстовую область программы
-            //ValidatorController.printToArea();                                                                                            //Выводим результат в текстовую область
-        }
-        deleteDir(new File(tempFiles));                                           //Удаление файлов из временной папки после валидации содержимого 1-го архива
-    }
-
-    public static void validate(File schemaPath, File filePath) throws IOException {
-        File mySchemaFile = new File(String.valueOf(schemaPath));
-        Source myXMLFile = new StreamSource(new File(String.valueOf(filePath)));
-        SchemaFactory schemaFactory = SchemaFactory
-                .newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        try {
-            Schema schema = schemaFactory.newSchema(mySchemaFile);
-            Validator validator = schema.newValidator();
-            validator.validate(myXMLFile);
-            consoleToArea = (myXMLFile.getSystemId() + " - Size is: " +
-                    (new File(fileSize(filePath.length()))) + " - IS VALID ");
-        } catch (SAXException | IOException e) {
-            if (schemaPath == null || filePath == null) {
-                System.out.println(consoleToArea =
-                        "Please provide the path to the schema and/or XML file for validation!!!");
-            } else {
-                consoleToArea = (myXMLFile.getSystemId() + " - Size is: " +
-                        (new File(fileSize(filePath.length()))) + " - IS NOT VALID." + "\n" + "Reason: " + e);
-            }
-        }
-    }
-
-    public static void writeFile(File files) throws IOException {
+/*
+    public static void saveFileIfInvalid(File files) throws IOException {
         if (!Files.exists(Paths.get(invalidFiles))) {
             Files.createDirectories(Paths.get(invalidFiles));
         }
@@ -289,8 +203,8 @@ public class SimpleXMLValidator extends Application {
         copyFileUsingStream(files, new File(tempFiles + files.getName()));
 
     }
-
-    private static void downloadFolder(FTPClient ftpClient, String remotePath, String localPath) throws IOException {
+*/
+    private static void ftpFileLoader(FTPClient ftpClient, String remotePath, String localPath) throws IOException {
         if (!Files.exists(Paths.get(localPath))) {
             Files.createDirectories(Paths.get(localPath));
         }
@@ -306,7 +220,7 @@ public class SimpleXMLValidator extends Application {
                 if (remoteFile.isDirectory()) {
                     new File(localFilePath).mkdirs();
 
-                    downloadFolder(ftpClient, remoteFilePath, localFilePath);
+                    ftpFileLoader(ftpClient, remoteFilePath, localFilePath);
                 } else {
                     System.out.println("Downloading file " + remoteFilePath + " to " +
                             localFilePath);
@@ -367,6 +281,8 @@ public class SimpleXMLValidator extends Application {
                 entry = zipIn.getNextEntry();
             }
             zipIn.close();
+            //Delete zip files
+            Files.delete(Paths.get(zipFilePath));
         } catch (IllegalArgumentException e) {
             consoleToArea = "Encoding error in to the Zip file - " + e;
         }
@@ -406,11 +322,11 @@ public class SimpleXMLValidator extends Application {
         file.mkdirs();
     }
 
-    static void deleteDir(File file) {
+    static void deleteAllFilesWithDirs(File file) {
         File[] contents = file.listFiles();
         if (contents != null) {
             for (File f : contents) {
-                deleteDir(f);
+                deleteAllFilesWithDirs(f);
             }
         }
         file.delete();
