@@ -8,6 +8,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import org.apache.commons.net.ftp.FTPFileFilter;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -33,7 +34,7 @@ public class SimpleXMLValidator extends Application {
     public static String selectedEnvironment = null;
     public static String ftpBaseFolder = null;
     public static String ftpOther = null;
-    public static String ftpOtherBaseFolder = null;
+    public static String otherFTPManualDir = null;
     public static String manualDir = "";
 
     @Override
@@ -85,7 +86,7 @@ public class SimpleXMLValidator extends Application {
     }
 
     public static void ftpClient() throws IOException {
-        System.out.println ("\n" + "Connect... to FTP and Downloading files ... " + "\n");
+        System.out.println("\n" + "Connect... to FTP and Downloading files ... " + "\n");
         long startTime = System.nanoTime();
         FTPClient ftpClient = new FTPClient();
         String env = null;
@@ -112,7 +113,9 @@ public class SimpleXMLValidator extends Application {
         System.out.println("Logged.");
         ftpClient.enterLocalPassiveMode();
         ftpClient.type(FTP.BINARY_FILE_TYPE);
+        //ftpClient.type(FTP.ASCII_FILE_TYPE);
         ftpClient.setControlEncoding("UTF-8");
+        //ftpClient.
 
         String baseFolder = null;
         Map<String, String> baseFolders = new HashMap<>();
@@ -124,18 +127,14 @@ public class SimpleXMLValidator extends Application {
             if (key.equals(ftpBaseFolder)) {
                 baseFolder = baseFolders.get(key);
             }
-            if(!(ftpOtherBaseFolder == null)) {
-                baseFolder = ftpOtherBaseFolder;
+            if (!(otherFTPManualDir == null)) {
+                baseFolder = otherFTPManualDir;
             }
         }
 
         FTPFile[] files;
         FTPFile[] dirs = ftpClient.listDirectories(baseFolder);
-        //if (baseFolder == null) {
-        //    dirs = ftpClient.listDirectories(ftpOtherBaseFolder);
-        //    baseFolder = ftpOtherBaseFolder;
-        //}
-
+        FTPFileFilter filter = ftpFile -> (ftpFile.isFile() && ftpFile.getSize() > 22);
         assert baseFolder != null;
         String fasPrefix = (baseFolder.equals("fcs_fas/")) ? "/currMonth" : "";                                              //Определяет, если выбрана проверка ФАС/ОВК, то добавляет каталог текущего месяца
         //в подкаталог "currMonth".
@@ -148,13 +147,20 @@ public class SimpleXMLValidator extends Application {
             }
         }
         if (selectedEnvironment.equals("Other")) {
-            for (FTPFile dir : dirs) {
-                System.out.println("Dir name - " + dir.getName() + "\n");
-                remotePath = dir.getName();
-                ftpFileLoader(ftpClient, baseFolder + remotePath, tempFiles);
+            if (manualDir.isEmpty()) {
+                for (FTPFile dir : dirs) {
+                    System.out.println("Dir name - " + dir.getName() + "\n");
+                    remotePath = dir.getName();
+                    ftpFileLoader(ftpClient, baseFolder + remotePath, tempFiles);
+                }
+            } else {
+                baseFolder = "";
+                files = ftpClient.listFiles(baseFolder + manualDir + fasPrefix, filter);
+                System.out.println("manualDir - " + manualDir + "\n");
+                parseFTPFiles(ftpClient, manualDir, files, baseFolder, fasPrefix);
             }
         } else {
-            files = ftpClient.listFiles(baseFolder + manualDir + fasPrefix);
+            files = ftpClient.listFiles(baseFolder + manualDir + fasPrefix, filter);
             System.out.println("manualDir - " + manualDir + "\n");
             parseFTPFiles(ftpClient, manualDir, files, baseFolder, fasPrefix);
         }
@@ -180,7 +186,7 @@ public class SimpleXMLValidator extends Application {
 
     public static void selectTempFTPFiles() {
         System.out.println(consoleToArea = ("\n" + "Get loaded files ..." + "\n"));
-        File folder = new File("C:\\XMLValidator\\tempFiles\\");
+        File folder = new File(tempFiles);
         File[] listOfFiles = folder.listFiles();
 
         assert listOfFiles != null;
@@ -191,19 +197,7 @@ public class SimpleXMLValidator extends Application {
         }
         pathForFiles = Arrays.asList(listOfFiles);
     }
-/*
-    public static void saveFileIfInvalid(File files) throws IOException {
-        if (!Files.exists(Paths.get(invalidFiles))) {
-            Files.createDirectories(Paths.get(invalidFiles));
-        }
-        if (consoleToArea.contains("IS NOT VALID.")) {
-            copyFileUsingStream(files, new File(invalidFiles + files.getName()));
-            consoleToArea = ("Invalid file !!! SAVED !!! to directory: " + invalidFiles + "\n");
-        }
-        copyFileUsingStream(files, new File(tempFiles + files.getName()));
 
-    }
-*/
     private static void ftpFileLoader(FTPClient ftpClient, String remotePath, String localPath) throws IOException {
         if (!Files.exists(Paths.get(localPath))) {
             Files.createDirectories(Paths.get(localPath));

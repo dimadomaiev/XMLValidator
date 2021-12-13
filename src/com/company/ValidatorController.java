@@ -43,7 +43,7 @@ public class ValidatorController {
     ObservableList<String> environmentList = FXCollections.observableArrayList("PAK", "EIS1", "EIS2", "EIS3", "EIS4", "EIS5", "EIS6", "EIS7", "Other");
 
     @FXML
-    private TextField ftpOtherBaseFolder;
+    private TextField otherFTPManualDir;
 
     @FXML
     private ChoiceBox<String> ftpBaseFolder;
@@ -112,7 +112,7 @@ public class ValidatorController {
             ftpLogin.setVisible(environment.getValue().equals("Other"));
             ftpPassword.setVisible(environment.getValue().equals("Other"));
             ftpBaseFolder.setVisible(!environment.getValue().equals("Other"));
-            ftpOtherBaseFolder.setVisible(environment.getValue().equals("Other"));
+            otherFTPManualDir.setVisible(environment.getValue().equals("Other"));
             ftpBaseFolderText.setVisible(!environment.getValue().equals("Other"));
             SimpleXMLValidator.selectedEnvironment = environment.getValue();
         });
@@ -171,7 +171,8 @@ public class ValidatorController {
             if (ftpTab.isSelected()) {
                 SimpleXMLValidator.manualDir = ftpManualDir.getText();
                 if (SimpleXMLValidator.selectedEnvironment.equals("Other")) {
-                    SimpleXMLValidator.ftpOtherBaseFolder = ftpOtherBaseFolder.getText();
+                    SimpleXMLValidator.otherFTPManualDir = otherFTPManualDir.getText();
+                    SimpleXMLValidator.manualDir = otherFTPManualDir.getText();
                     SimpleXMLValidator.ftpOther = ftpOtherURL.getText();
                 }
 
@@ -190,7 +191,7 @@ public class ValidatorController {
                     return;
                 }
 
-                if (SimpleXMLValidator.ftpOtherBaseFolder == null & SimpleXMLValidator.selectedEnvironment.equals("Other")) {
+                if (SimpleXMLValidator.otherFTPManualDir == null & SimpleXMLValidator.selectedEnvironment.equals("Other")) {
                     System.out.println(consoleToArea = "Please specify base folder of other environment ! ...");
                     this.consoleArea();
                     return;
