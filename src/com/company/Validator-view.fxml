@@ -53,7 +53,7 @@
                                 <TextField fx:id="ftpLogin" layoutX="191.0" layoutY="15.0" prefHeight="25.0" prefWidth="80.0" promptText="Login" visible="false" />
                                 <PasswordField fx:id="ftpPassword" layoutX="280.0" layoutY="15.0" prefHeight="25.0" prefWidth="80.0" promptText="Pass" visible="false" />
                                 <TextField fx:id="ftpOtherURL" layoutX="365.0" layoutY="15.0" prefHeight="25.0" prefWidth="220.0" promptText="FTP Environment" visible="false" />
-                                <TextField fx:id="otherFTPManualDir" layoutX="595.0" layoutY="15.0" prefHeight="25.0" prefWidth="275.0" promptText="End folder of other FTP for validate." visible="false" />
+                                <TextField fx:id="otherFTPManualDir" layoutX="595.0" layoutY="15.0" prefHeight="25.0" prefWidth="275.0" promptText="FTP target directory for validate." visible="false" />
                         <Button fx:id="ftpURLBrowser" layoutX="843.0" layoutY="15.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="27.0" text="FTPBrowser" visible="false" />
                             </children>
                         </AnchorPane>
