@@ -35,7 +35,7 @@
                 <Tab fx:id="localTab" text="Local Tab">
                     <content>
                         <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="51.0" prefWidth="882.0">
-                            <Text layoutX="10.0" layoutY="32.0" strokeType="OUTSIDE" strokeWidth="0.0" text="A file(s)" />
+                            <Text layoutX="10.0" layoutY="32.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Files" textAlignment="CENTER" />
                             <Button fx:id="selectXMLFile" layoutX="80.0" layoutY="15.0" mnemonicParsing="false" prefWidth="100.0" text="Select a File(s)" />
                             <TextField layoutX="189.0" layoutY="15.0" prefHeight="26.0" prefWidth="680.0" promptText="Specify the path to &quot;.xml&quot; or &quot;.zip&quot; file(s) for validation according to the .xsd schema." fx:id="xmlFilePath" />
                         </AnchorPane>
@@ -63,7 +63,7 @@
         </TabPane>
         <AnchorPane prefHeight="404.0" prefWidth="889.0">
             <children>
-                <Text layoutX="10.0" layoutY="30.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Schemes" />
+                <Text layoutX="10.0" layoutY="30.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Schemes" textAlignment="CENTER" />
                 <Button fx:id="selectSchemaFile" layoutX="80.0" layoutY="10.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="100.0" text="Select Schemes" />
                 <TextField fx:id="schemaFilePath" layoutX="190.0" layoutY="10.0" prefHeight="25.0" prefWidth="680.0" promptText="Specify the path to the schema file. For example fcsExport.xsd" />
                 <Button fx:id="startValidation" layoutX="400.0" layoutY="50.0" mnemonicParsing="false" onAction="#initialize" text="Start Validation" />
