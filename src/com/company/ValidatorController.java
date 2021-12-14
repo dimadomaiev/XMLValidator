@@ -60,6 +60,9 @@ public class ValidatorController {
     private TextField ftpManualDir;
 
     @FXML
+    private Button ftpURLBrowser;
+
+    @FXML
     private TextField schemaFilePath;
 
     void setPromptSchemaFilePath(File file) {
@@ -75,7 +78,6 @@ public class ValidatorController {
 
     @FXML
     private Button startValidation;
-
 
     @FXML
     private Button selectSchemaFile;
@@ -109,11 +111,13 @@ public class ValidatorController {
         environment.setItems(environmentList);
         environment.setOnAction(actionEvent -> {
             ftpOtherURL.setVisible(environment.getValue().equals("Other"));
-            ftpManualDir.setVisible(!environment.getValue().equals("Other"));
+            //ftpURLBrowser.setVisible(environment.getValue().equals("Other"));                                         //Придумать как можно запустить проводник на ФТП
             ftpLogin.setVisible(environment.getValue().equals("Other"));
             ftpPassword.setVisible(environment.getValue().equals("Other"));
-            ftpBaseFolder.setVisible(!environment.getValue().equals("Other"));
             otherFTPManualDir.setVisible(environment.getValue().equals("Other"));
+//----------------------------------------------------------------------------------------------------------------------
+            ftpManualDir.setVisible(!environment.getValue().equals("Other"));
+            ftpBaseFolder.setVisible(!environment.getValue().equals("Other"));
             ftpBaseFolderText.setVisible(!environment.getValue().equals("Other"));
             SimpleXMLValidator.selectedEnvironment = environment.getValue();
         });
@@ -136,7 +140,6 @@ public class ValidatorController {
                 System.out.println(consoleToArea = "Please select schema to validate file(s)!\n");
                 this.consoleArea();
                 this.setPromptSchemaFilePath(new File(consoleToArea.toUpperCase(Locale.ROOT)));
-                //this.setPromptXMLFilePath(new File(consoleToArea.toUpperCase(Locale.ROOT)));
                 return;
             }
 
@@ -220,7 +223,7 @@ public class ValidatorController {
                 } catch (IOException e) {
                     e.printStackTrace();
                     System.out.println("Problem with connection to FTP. Error - " + e);
-                    System.out.println(consoleToArea = "Please specify environment ! ... Or check VPN connection... " );
+                    System.out.println(consoleToArea = "Please specify environment ! ... Or check VPN connection... ");
                     this.consoleArea();
                     return;
                 }
@@ -234,6 +237,9 @@ public class ValidatorController {
                             SimpleXMLValidator.unzip(String.valueOf(pathForFile), SimpleXMLValidator.tempFiles);
                         } catch (IOException e) {
                             e.printStackTrace();
+                            System.out.println(consoleToArea = "Unpacking error ... " + e);
+                            this.consoleArea();
+                            return;
                         }
                     }
                 }
@@ -248,6 +254,9 @@ public class ValidatorController {
                             validate(SimpleXMLValidator.schemaFile, pathForFile);
                         } catch (IOException e) {
                             e.printStackTrace();
+                            System.out.println(consoleToArea = "Validation method error ... " + e);
+                            this.consoleArea();
+                            return;
                         }
                     }
                 }
@@ -255,19 +264,27 @@ public class ValidatorController {
             }
         });
 
+        ftpURLBrowser.setOnAction(actionEvent -> {
+            //SimpleXMLValidator.stageFile(window);
+                }
+        );
+
         invalidFilesWindow.setOnAction(actionEvent -> {
                     try {
                         Desktop.getDesktop().open(new File(SimpleXMLValidator.invalidFiles));
                     } catch (IOException e) {
                         e.printStackTrace();
+                        System.out.println(consoleToArea = "Error opening invalidFiles folder ... " + e);
+                        this.consoleArea();
                     }
                 }
-
         );
+
         clearConsole.setOnAction(actionEvent -> {
             console.clear();
             SimpleXMLValidator.deleteAllFilesWithDirs(new File(SimpleXMLValidator.tempFiles));
         });
+
         linkToWiki.setOnAction(actionEvent -> {
             consoleToArea = "Sorry for the inconvenience." + "\n" + "Wiki page does not exist at this moment.";
             this.consoleArea();

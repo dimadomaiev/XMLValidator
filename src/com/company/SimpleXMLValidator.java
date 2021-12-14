@@ -1,5 +1,10 @@
 package com.company;
 
+import javafx.concurrent.Task;
+import javafx.geometry.Pos;
+import javafx.scene.control.ProgressBar;
+import javafx.scene.control.ProgressIndicator;
+import javafx.scene.layout.HBox;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
@@ -25,6 +30,7 @@ import java.util.zip.ZipInputStream;
 import static com.company.ValidatorController.consoleToArea;
 
 public class SimpleXMLValidator extends Application {
+
     public static File schemaFile = null;
     public static File xmlFile = null;
     public static List<File> pathForFiles;
@@ -38,6 +44,7 @@ public class SimpleXMLValidator extends Application {
     public static String manualDir = "";
     public static String username = "free";
     public static String password = "free";
+    public static File ftpURL = new File("ftp://" + username + ":" + password + "@" + ftpOther);
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -75,6 +82,10 @@ public class SimpleXMLValidator extends Application {
                 "XML files (*.xml;*.zip)", "*.xml", "*.zip"));// ,"*.7z","*.rar"));
         if (pathToSelectedFiles != null) {
             fileChooser.setInitialDirectory(new File(pathToSelectedFiles.getParent()));
+        }
+        //Запуск проводника на ФТП. Хз как реализовать пока что...
+        if (selectedEnvironment.equals("Other")) {
+            fileChooser.setInitialDirectory(ftpURL);
         }
         pathForFiles = fileChooser.showOpenMultipleDialog(s);
         if (pathForFiles != null) {
@@ -136,7 +147,8 @@ public class SimpleXMLValidator extends Application {
         FTPFile[] dirs = ftpClient.listDirectories(baseFolder);
         FTPFileFilter filter = ftpFile -> (ftpFile.isFile() && ftpFile.getSize() > 22);
         assert baseFolder != null;
-        String fasPrefix = (baseFolder.equals("fcs_fas/")) ? "/currMonth" : "";                                              //Определяет, если выбрана проверка ФАС/ОВК, то добавляет каталог текущего месяца
+        //Определяет, если выбрана проверка ФАС/ОВК, то добавляет каталог текущего месяца
+        String fasPrefix = (baseFolder.equals("fcs_fas/")) ? "/currMonth" : "";
         //в подкаталог "currMonth".
         String remotePath;
         if (manualDir.isEmpty() & !selectedEnvironment.equals("Other")) {
@@ -199,6 +211,7 @@ public class SimpleXMLValidator extends Application {
     }
 
     private static void ftpFileLoader(FTPClient ftpClient, String remotePath, String localPath) throws IOException {
+
         if (!Files.exists(Paths.get(localPath))) {
             Files.createDirectories(Paths.get(localPath));
         }
@@ -228,6 +241,31 @@ public class SimpleXMLValidator extends Application {
                 }
             }
         }
+//----------------------------------------------------------------------------------------------------------------------
+        // Progress bar
+        int start = 10;
+        int end = 1000;
+
+        Task<Void> progress = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                try {
+                    for (long progress = 0; progress < start; progress = end) {
+                        Thread.sleep(300);
+                        System.out.println(progress);
+                        updateProgress(progress, start);
+
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+        };
+        //Progress bar starter
+        //ProgressBar slider = startProgressBar();
+        //slider.progressProperty().bind(progress.progressProperty());
+//----------------------------------------------------------------------------------------------------------------------
     }
 
     static String fileSize(Long size) {
@@ -275,7 +313,7 @@ public class SimpleXMLValidator extends Application {
                 entry = zipIn.getNextEntry();
             }
             zipIn.close();
-            //Delete zip files
+            //Delete zip file
             Files.delete(Paths.get(zipFilePath));
         } catch (IllegalArgumentException e) {
             consoleToArea = "Encoding error in to the Zip file - " + e;
@@ -324,5 +362,21 @@ public class SimpleXMLValidator extends Application {
             }
         }
         file.delete();
+    }
+
+    public static ProgressBar startProgressBar() {
+        Stage primaryStage = new Stage();
+        ProgressBar pb = new ProgressBar(0);
+        ProgressIndicator pi = new ProgressIndicator(0);
+        pi.progressProperty().bind(pb.progressProperty());
+        HBox hb = new HBox();
+        hb.setSpacing(5);
+        hb.setAlignment(Pos.CENTER);
+        hb.getChildren().addAll(pb);
+        Scene scene = new Scene(hb, 300, 100);
+        primaryStage.setScene(scene);
+        primaryStage.setTitle("Downloading FTP Files ...");
+        primaryStage.show();
+        return pb;
     }
 }
