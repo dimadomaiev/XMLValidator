@@ -63,14 +63,14 @@ public class ValidatorController {
     private TextField schemaFilePath;
 
     void setPromptSchemaFilePath(File file) {
-        schemaFilePath.setPromptText(String.valueOf(file));                                                                      //Устанавливаем путь к файлу в поле после выбора схемы
+        schemaFilePath.setPromptText(String.valueOf(file));                                                             //Устанавливаем путь к файлу в поле после выбора схемы
     }
 
     @FXML
     private TextField xmlFilePath;
 
     void setPromptXMLFilePath(File file) {
-        xmlFilePath.setPromptText(String.valueOf(file));                                           //Устанавливаем путь к файлу в поле после выбора файла
+        xmlFilePath.setPromptText(String.valueOf(file));                                                                //Устанавливаем путь к файлу в поле после выбора файла
     }
 
     @FXML
@@ -104,7 +104,7 @@ public class ValidatorController {
     @FXML
     private void initialize() {
         SimpleXMLValidator.deleteAllFilesWithDirs(new File(SimpleXMLValidator.tempFiles));
-        SimpleXMLValidator.deleteAllFilesWithDirs(new File(SimpleXMLValidator.invalidFiles));                                        //Удаление не валидные файлов из временной папки при запуске программы
+        SimpleXMLValidator.deleteAllFilesWithDirs(new File(SimpleXMLValidator.invalidFiles));                           //Удаление не валидные файлов из временной папки при запуске программы
         Stage window = new Stage();                                                                                     // Инициализируем окно
         environment.setItems(environmentList);
         environment.setOnAction(actionEvent -> {
@@ -123,14 +123,14 @@ public class ValidatorController {
 
         selectSchemaFile.setOnAction(actionEvent -> {                                                                   //Задаем действие на кнопку selectSchemaFile
             SimpleXMLValidator.stageSchema(window);                                                                     //Вызываем метод выбора файла
-            this.setPromptSchemaFilePath(SimpleXMLValidator.schemaFile);                                                                             //Задаем в промте поля путь к выбранному файлу
+            this.setPromptSchemaFilePath(SimpleXMLValidator.schemaFile);                                                //Задаем в промте поля путь к выбранному файлу
         });
 
         selectXMLFile.setOnAction(actionEvent -> {                                                                      // Задаем действие на кнопку selectXMLFile
             SimpleXMLValidator.stageFile(window);                                                                       // Вызываем метод выбора файла
-            this.setPromptXMLFilePath(SimpleXMLValidator.xmlFile);                                                                                // Задаем в промте поля путь к выбранному файлу
+            this.setPromptXMLFilePath(SimpleXMLValidator.xmlFile);                                                      // Задаем в промте поля путь к выбранному файлу
         });
-//----------------------------------------------------------------------------------------------------------------------
+//----------------------------------------------------Local-------------------------------------------------------------
         startValidation.setOnAction(actionEvent -> {
             if (SimpleXMLValidator.schemaFile == null) {
                 System.out.println(consoleToArea = "Please select schema to validate file(s)!\n");
@@ -155,6 +155,7 @@ public class ValidatorController {
                         e.printStackTrace();
                     }
                 }
+
                 SimpleXMLValidator.selectTempFTPFiles();
                 for (File pathForFile : SimpleXMLValidator.pathForFiles) {
                     if (pathForFile.getName().endsWith(".zip")) {
@@ -165,6 +166,7 @@ public class ValidatorController {
                         }
                     }
                 }
+
                 SimpleXMLValidator.selectTempFTPFiles();
                 this.setPromptXMLFilePath(new File(String.valueOf(SimpleXMLValidator.pathForFiles)));
 
@@ -178,7 +180,7 @@ public class ValidatorController {
                     }
                 }
             }
-//----------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------FTP-------------------------------------------------------------------
             if (ftpTab.isSelected()) {
                 if (SimpleXMLValidator.selectedEnvironment == null) {
                     System.out.println(consoleToArea = "Please specify environment ! ...");
@@ -198,8 +200,6 @@ public class ValidatorController {
                         SimpleXMLValidator.password = ftpPassword.getText();
                     }
                 }
-
-
 
                 if (SimpleXMLValidator.ftpBaseFolder == null & !SimpleXMLValidator.selectedEnvironment.equals("Other")) {
                     System.out.println(consoleToArea = "Please specify base folder of environment ! ...");
@@ -295,5 +295,4 @@ public class ValidatorController {
             this.consoleArea();
         }
     }
-
 }

@@ -36,8 +36,8 @@ public class SimpleXMLValidator extends Application {
     public static String ftpOther = null;
     public static String otherFTPManualDir = null;
     public static String manualDir = "";
-    public static String username = "Free";
-    public static String password = "Free";
+    public static String username = "free";
+    public static String password = "free";
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -115,9 +115,7 @@ public class SimpleXMLValidator extends Application {
         System.out.println("Logged.");
         ftpClient.enterLocalPassiveMode();
         ftpClient.type(FTP.BINARY_FILE_TYPE);
-        //ftpClient.type(FTP.ASCII_FILE_TYPE);
         ftpClient.setControlEncoding("UTF-8");
-        //ftpClient.
 
         String baseFolder = null;
         Map<String, String> baseFolders = new HashMap<>();
