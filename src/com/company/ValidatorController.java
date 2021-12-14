@@ -159,7 +159,7 @@ public class ValidatorController {
                     }
                 }
 
-                SimpleXMLValidator.selectTempFTPFiles();
+                SimpleXMLValidator.selectTempFTPFiles(1);
                 for (File pathForFile : SimpleXMLValidator.pathForFiles) {
                     if (pathForFile.getName().endsWith(".zip")) {
                         try {
@@ -170,7 +170,7 @@ public class ValidatorController {
                     }
                 }
 
-                SimpleXMLValidator.selectTempFTPFiles();
+                SimpleXMLValidator.selectTempFTPFiles(1);
                 this.setPromptXMLFilePath(new File(String.valueOf(SimpleXMLValidator.pathForFiles)));
 
                 for (File pathForFile : SimpleXMLValidator.pathForFiles) {
@@ -182,6 +182,7 @@ public class ValidatorController {
                         }
                     }
                 }
+                SimpleXMLValidator.selectTempFTPFiles(2);
             }
 //------------------------------------------------FTP-------------------------------------------------------------------
             if (ftpTab.isSelected()) {
@@ -230,7 +231,7 @@ public class ValidatorController {
 
                 consoleToArea = ("\n" + "Unzip loaded files ..." + "\n");
                 this.consoleArea();
-                SimpleXMLValidator.selectTempFTPFiles();
+                SimpleXMLValidator.selectTempFTPFiles(1);
                 for (File pathForFile : SimpleXMLValidator.pathForFiles) {
                     if (pathForFile.getName().endsWith(".zip")) {
                         try {
@@ -246,7 +247,7 @@ public class ValidatorController {
 
                 consoleToArea = ("\n" + "Validate ..." + "\n");
                 this.consoleArea();
-                SimpleXMLValidator.selectTempFTPFiles();
+                SimpleXMLValidator.selectTempFTPFiles(1);
                 this.setPromptXMLFilePath(new File(SimpleXMLValidator.tempFiles));
                 for (File pathForFile : SimpleXMLValidator.pathForFiles) {
                     if (pathForFile.getName().endsWith(".xml")) {
@@ -261,6 +262,7 @@ public class ValidatorController {
                     }
                 }
                 //try {Thread.sleep(100);} catch (InterruptedException e) {e.printStackTrace();}
+                SimpleXMLValidator.selectTempFTPFiles(3);
             }
         });
 
@@ -286,7 +288,7 @@ public class ValidatorController {
         });
 
         linkToWiki.setOnAction(actionEvent -> {
-            consoleToArea = "Sorry for the inconvenience." + "\n" + "Wiki page does not exist at this moment.";
+            consoleToArea = "Sorry for inconvenience." + "\n" + "Wiki page does not exist at this moment.";
             this.consoleArea();
         });
     }

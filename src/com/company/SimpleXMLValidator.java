@@ -19,10 +19,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.DecimalFormat;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -37,9 +34,9 @@ public class SimpleXMLValidator extends Application {
     public static File pathToSelectedFiles = null;
     public static String tempFiles = "C:\\XMLValidator\\tempFiles\\";
     public static String invalidFiles = "C:\\XMLValidator\\invalidFiles\\";
-    public static String selectedEnvironment = null;
-    public static String ftpBaseFolder = null;
-    public static String ftpOther = null;
+    public static String selectedEnvironment = "";
+    public static String ftpBaseFolder = "";
+    public static String ftpOther = "";
     public static String otherFTPManualDir = null;
     public static String manualDir = "";
     public static String username = "free";
@@ -196,18 +193,25 @@ public class SimpleXMLValidator extends Application {
         }
     }
 
-    public static void selectTempFTPFiles() {
+    public static void selectTempFTPFiles(int stage) {
         System.out.println(consoleToArea = ("\n" + "Get loaded files ..." + "\n"));
         File folder = new File(tempFiles);
         File[] listOfFiles = folder.listFiles();
 
-        assert listOfFiles != null;
-        for (File file : listOfFiles) {
-            if (file.isFile()) {
-                System.out.println(file.getName());
+        if (stage == 1& listOfFiles != null) {
+            for (File file : listOfFiles) {
+                if (file.isFile()) {
+                    System.out.println(file.getName());
+                }
             }
+            pathForFiles = Arrays.asList(listOfFiles);
         }
-        pathForFiles = Arrays.asList(listOfFiles);
+        if (stage == 2) {
+            pathForFiles = Collections.singletonList(pathToSelectedFiles);
+        }
+        if (stage == 3) {
+            return;
+        }
     }
 
     private static void ftpFileLoader(FTPClient ftpClient, String remotePath, String localPath) throws IOException {
