@@ -98,12 +98,10 @@ public class SimpleXMLValidator extends Application {
         String env = null;
         Map<String, String> envs = new HashMap<>();
         envs.put("PAK", "ftp.zakupki.gov.ru");
-        envs.put("EIS1", "eis.lanit.ru");
-        envs.put("EIS2", "eis2.lanit.ru"); //eis2
         envs.put("EIS3", "eis3.lanit.ru"); //eis3
         envs.put("EIS4", "eis4.roskazna.ru"); //eis4
         envs.put("EIS5", "eis5.roskazna.ru"); //eis5
-        envs.put("EIS6", "eis6.lanit.ru"); //eis6
+        envs.put("EIS6", "192.168.232.17"); //eis6
         envs.put("EIS7", "eis7.lanit.ru"); //eis7
         envs.put("Other", ftpOther); //Other
         for (String key : envs.keySet()) {

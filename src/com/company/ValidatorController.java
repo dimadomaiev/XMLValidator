@@ -214,7 +214,7 @@ public class ValidatorController {
                     return;
                 }
 
-                consoleToArea = ("\n" + "Connect ... and download FTP files ..." + "\n");
+                consoleToArea = ("\n" + "Connect ... and download FTP files ..." + "\n" + "It can take some time :'(");
                 this.consoleArea();
                 try {
                     SimpleXMLValidator.ftpClient();
@@ -260,7 +260,9 @@ public class ValidatorController {
                 }
                 SimpleXMLValidator.selectTempFTPFiles(3);
             }
-            consoleToArea = ("\n" + "!!! Verification completed. !!!" + "\n");
+            consoleToArea = ("\n" + "---------------------------------------------------------------------------- !!! Verification completed !!! ----------------------------------------------------------------------------" + "\n");
+            this.consoleArea();
+            consoleToArea = ("\n" + "------------------------------------------------------------ !!! Invalid files saved to: \"C:\\XMLValidator\\invalidFiles\" !!! ------------------------------------------------------------" + "\n");
             this.consoleArea();
         }).start());
 
