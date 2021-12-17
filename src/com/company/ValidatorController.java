@@ -19,8 +19,7 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 import java.awt.*;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.Locale;
 
 public class ValidatorController {
@@ -41,7 +40,7 @@ public class ValidatorController {
 
     @FXML
     private ChoiceBox<String> environment;
-    ObservableList<String> environmentList = FXCollections.observableArrayList("PAK", "EIS1", "EIS2", "EIS3", "EIS4", "EIS5", "EIS6", "EIS7", "Other");
+    //public static ObservableList<String> environmentList = FXCollections.observableArrayList("EIS3", "EIS4", "EIS5", "EIS6", "EIS7", "PAK", "Other");
 
     @FXML
     private TextField otherFTPManualDir;
@@ -105,8 +104,16 @@ public class ValidatorController {
 
         SimpleXMLValidator.deleteAllFilesWithDirs(new File(SimpleXMLValidator.tempFiles));
         SimpleXMLValidator.deleteAllFilesWithDirs(new File(SimpleXMLValidator.invalidFiles));                           //Удаление не валидные файлов из временной папки при запуске программы
+        SimpleXMLValidator.createConfigFile();
+        try {
+            SimpleXMLValidator.initialEnvironments();
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println(consoleToArea = "Error initial config file.\n" + e);
+            this.consoleArea();
+        }
         Stage window = new Stage();                                                                                     // Инициализируем окно
-        environment.setItems(environmentList);
+        environment.setItems(SimpleXMLValidator.environmentList);
         environment.setOnAction(actionEvent -> {
             ftpOtherURL.setVisible(environment.getValue().equals("Other"));
             ftpLogin.setVisible(environment.getValue().equals("Other"));
