@@ -40,7 +40,6 @@ public class ValidatorController {
 
     @FXML
     private ChoiceBox<String> environment;
-    //public static ObservableList<String> environmentList = FXCollections.observableArrayList("EIS3", "EIS4", "EIS5", "EIS6", "EIS7", "PAK", "Other");
 
     @FXML
     private TextField otherFTPManualDir;

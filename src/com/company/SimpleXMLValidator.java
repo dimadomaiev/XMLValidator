@@ -60,15 +60,20 @@ public class SimpleXMLValidator extends Application {
 
         try {
             if (!SimpleXMLValidator.configFile.exists()) {
-                PrintWriter writer = null;
-                writer = new PrintWriter(SimpleXMLValidator.configFile, "UTF-8");
-                writer.println(";_________________________________");
-                writer.println(";Это конфиг файл, в него можно добавлять собственное окружение(Environment) которое будет доступно для выбора...");
-                writer.println(";Окружение должно быть задано разбитием строки через двоеточие...");
+                PrintWriter writer = new PrintWriter(SimpleXMLValidator.configFile, "UTF-8");
+                writer.println(";Это конфиг файл, в него можно добавлять собственное окружение(Environment) которое будет доступно для выбора ...");
+                writer.println(";Символ \" ; \" точка с запятой коментирует строку ... ");
+                writer.println(";Окружение должно быть задано разбитием строки через \" : \" двоеточие ...");
                 writer.println(";Пример \"EIS1:eis.lanit.ru\" ");
                 writer.println(";Добавить свои окружения ниже прочерка. ");
                 writer.println(";После чего сохранить файл, скопировать, перезапустить приложение и подменить файл конфига. ");
                 writer.println(";_________________________________");
+                writer.println("EIS3:eis3.lanit.ru");
+                writer.println("EIS4:eis4.roskazna.ru");
+                writer.println("EIS5:eis5.roskazna.ru");
+                writer.println("EIS6:192.168.232.17");
+                writer.println("EIS7:eis7.lanit.ru");
+                writer.println("PAK:ftp.zakupki.gov.ru");
                 writer.close();
             }
 
@@ -118,14 +123,6 @@ public class SimpleXMLValidator extends Application {
 
     public static void initialEnvironments() throws IOException {
         envs = new HashMap<>();
-        envs.put("EIS3", "eis3.lanit.ru"); //eis3
-        envs.put("EIS4", "eis4.roskazna.ru"); //eis4
-        envs.put("EIS5", "eis5.roskazna.ru"); //eis5
-        envs.put("EIS6", "192.168.232.17"); //eis6
-        envs.put("EIS7", "eis7.lanit.ru"); //eis7
-        envs.put("PAK", "ftp.zakupki.gov.ru");
-        envs.put("Other", ftpOther); //Other
-
         String line;
         BufferedReader reader = new BufferedReader(new FileReader(configFile));
         while ((line = reader.readLine()) != null) {
@@ -140,48 +137,19 @@ public class SimpleXMLValidator extends Application {
                 System.out.println("ignoring line: " + line);
             }
         }
+        envs.put("Other", ftpOther); //Other
     }
 
     public static void ftpClient() throws IOException {
-        //run();
         System.out.println("\n" + "Connect... to FTP and Downloading files ... " + "\n");
         long startTime = System.nanoTime();
         FTPClient ftpClient = new FTPClient();
         String env = null;
-        /*
-        //Map<String, String>
-        envs = new HashMap<>();
-        envs.put("PAK", "ftp.zakupki.gov.ru");
-        envs.put("EIS3", "eis3.lanit.ru"); //eis3
-        envs.put("EIS4", "eis4.roskazna.ru"); //eis4
-        envs.put("EIS5", "eis5.roskazna.ru"); //eis5
-        envs.put("EIS6", "192.168.232.17"); //eis6
-        envs.put("EIS7", "eis7.lanit.ru"); //eis7
-        envs.put("Other", ftpOther); //Other
-
-        String line;
-        BufferedReader reader = new BufferedReader(new FileReader(configFile));
-        while ((line = reader.readLine()) != null)
-        {
-            String[] parts = line.split(":", 2);
-            if (parts.length >= 2)
-            {
-                String key = parts[0];
-                String value = parts[1];
-                envs.put(key, value);
-                System.out.println(value);
-                environmentList.add(key);
-            } else {
-                System.out.println("ignoring line: " + line);
-            }
-        }
-*/
         for (String key : envs.keySet()) {
             if (key.equals(selectedEnvironment)) {
                 env = envs.get(key);
             }
         }
-
         System.out.println("Connect... to " + env);
         ftpClient.connect(env);
         System.out.println("Connected.\nLogin...");
