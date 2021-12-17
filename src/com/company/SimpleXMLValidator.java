@@ -40,7 +40,7 @@ public class SimpleXMLValidator extends Application {
     public static String password = "free";
     public static File ftpURL = new File("ftp://" + username + ":" + password + "@" + ftpOther);
     public static File configFile = new File("C:\\XMLValidator\\config.txt");
-    public static ObservableList<String> environmentList = FXCollections.observableArrayList("EIS3", "EIS4", "EIS5", "EIS6", "EIS7", "PAK", "Other");
+    public static ObservableList<String> environmentList = FXCollections.observableArrayList();
     public static Map<String, String> envs = null;
 
     @Override
