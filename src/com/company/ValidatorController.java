@@ -60,9 +60,6 @@ public class ValidatorController {
     private TextField ftpManualDir;
 
     @FXML
-    private Button ftpURLBrowser;
-
-    @FXML
     private TextField schemaFilePath;
 
     void setPromptSchemaFilePath(File file) {
@@ -105,13 +102,13 @@ public class ValidatorController {
 
     @FXML
     private void initialize() {
+
         SimpleXMLValidator.deleteAllFilesWithDirs(new File(SimpleXMLValidator.tempFiles));
         SimpleXMLValidator.deleteAllFilesWithDirs(new File(SimpleXMLValidator.invalidFiles));                           //Удаление не валидные файлов из временной папки при запуске программы
         Stage window = new Stage();                                                                                     // Инициализируем окно
         environment.setItems(environmentList);
         environment.setOnAction(actionEvent -> {
             ftpOtherURL.setVisible(environment.getValue().equals("Other"));
-            //ftpURLBrowser.setVisible(environment.getValue().equals("Other"));                                         //Придумать как можно запустить проводник на ФТП
             ftpLogin.setVisible(environment.getValue().equals("Other"));
             ftpPassword.setVisible(environment.getValue().equals("Other"));
             otherFTPManualDir.setVisible(environment.getValue().equals("Other"));
@@ -135,7 +132,8 @@ public class ValidatorController {
             this.setPromptXMLFilePath(SimpleXMLValidator.xmlFile);                                                      // Задаем в промте поля путь к выбранному файлу
         });
 //----------------------------------------------------Local-------------------------------------------------------------
-        startValidation.setOnAction(actionEvent -> {
+        startValidation.setOnAction(actionEvent -> new Thread(() -> {
+            SimpleXMLValidator.deleteAllFilesWithDirs(new File(SimpleXMLValidator.tempFiles));
             if (SimpleXMLValidator.schemaFile == null) {
                 System.out.println(consoleToArea = "Please select schema to validate file(s)!\n");
                 this.consoleArea();
@@ -172,7 +170,6 @@ public class ValidatorController {
 
                 SimpleXMLValidator.selectTempFTPFiles(1);
                 this.setPromptXMLFilePath(new File(String.valueOf(SimpleXMLValidator.pathForFiles)));
-
                 for (File pathForFile : SimpleXMLValidator.pathForFiles) {
                     if (pathForFile.getName().endsWith(".xml")) {
                         try {
@@ -221,6 +218,7 @@ public class ValidatorController {
                 this.consoleArea();
                 try {
                     SimpleXMLValidator.ftpClient();
+                    SimpleXMLValidator.selectTempFTPFiles(1);
                 } catch (IOException e) {
                     e.printStackTrace();
                     System.out.println("Problem with connection to FTP. Error - " + e);
@@ -229,13 +227,13 @@ public class ValidatorController {
                     return;
                 }
 
-                consoleToArea = ("\n" + "Unzip loaded files ..." + "\n");
+                consoleToArea = ("\n" + "Unzipping loaded files ..." + "\n");
                 this.consoleArea();
-                SimpleXMLValidator.selectTempFTPFiles(1);
                 for (File pathForFile : SimpleXMLValidator.pathForFiles) {
                     if (pathForFile.getName().endsWith(".zip")) {
                         try {
                             SimpleXMLValidator.unzip(String.valueOf(pathForFile), SimpleXMLValidator.tempFiles);
+                            SimpleXMLValidator.selectTempFTPFiles(1);
                         } catch (IOException e) {
                             e.printStackTrace();
                             System.out.println(consoleToArea = "Unpacking error ... " + e);
@@ -247,7 +245,6 @@ public class ValidatorController {
 
                 consoleToArea = ("\n" + "Validate ..." + "\n");
                 this.consoleArea();
-                SimpleXMLValidator.selectTempFTPFiles(1);
                 this.setPromptXMLFilePath(new File(SimpleXMLValidator.tempFiles));
                 for (File pathForFile : SimpleXMLValidator.pathForFiles) {
                     if (pathForFile.getName().endsWith(".xml")) {
@@ -261,15 +258,12 @@ public class ValidatorController {
                         }
                     }
                 }
-                //try {Thread.sleep(100);} catch (InterruptedException e) {e.printStackTrace();}
                 SimpleXMLValidator.selectTempFTPFiles(3);
             }
-        });
+            consoleToArea = ("\n" + "!!! Verification completed. !!!" + "\n");
+            this.consoleArea();
+        }).start());
 
-        ftpURLBrowser.setOnAction(actionEvent -> {
-            //SimpleXMLValidator.stageFile(window);
-                }
-        );
 
         invalidFilesWindow.setOnAction(actionEvent -> {
                     try {
@@ -294,6 +288,7 @@ public class ValidatorController {
     }
 
     void validate(File schemaPath, File filePath) throws IOException {
+
         File mySchemaFile = new File(String.valueOf(schemaPath));
         Source myXMLFile = new StreamSource(new File(String.valueOf(filePath)));
         SchemaFactory schemaFactory = SchemaFactory
@@ -309,7 +304,12 @@ public class ValidatorController {
                 System.out.println(consoleToArea = "Please provide the path to the schema and/or XML file for validation!!!" + "\n");
             } else {
                 System.out.println(consoleToArea = (myXMLFile.getSystemId() + " - Size is: " + (new File(SimpleXMLValidator.fileSize(filePath.length()))) + " - IS NOT VALID." + "\n" + "Reason: " + e + "\n"));
-                SimpleXMLValidator.copyFileUsingStream(filePath, new File(SimpleXMLValidator.invalidFiles + filePath.getName()));
+                try {
+                    SimpleXMLValidator.copyFileUsingStream(filePath, new File(SimpleXMLValidator.invalidFiles + filePath.getName()));
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                    System.out.println("Error while copping invalid file... " + ex);
+                }
             }
             this.consoleArea();
         }

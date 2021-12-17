@@ -1,10 +1,5 @@
 package com.company;
 
-import javafx.concurrent.Task;
-import javafx.geometry.Pos;
-import javafx.scene.control.ProgressBar;
-import javafx.scene.control.ProgressIndicator;
-import javafx.scene.layout.HBox;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
@@ -96,6 +91,7 @@ public class SimpleXMLValidator extends Application {
     }
 
     public static void ftpClient() throws IOException {
+        //run();
         System.out.println("\n" + "Connect... to FTP and Downloading files ... " + "\n");
         long startTime = System.nanoTime();
         FTPClient ftpClient = new FTPClient();
@@ -245,31 +241,6 @@ public class SimpleXMLValidator extends Application {
                 }
             }
         }
-//----------------------------------------------------------------------------------------------------------------------
-        // Progress bar
-        int start = 10;
-        int end = 1000;
-
-        Task<Void> progress = new Task<Void>() {
-            @Override
-            protected Void call() throws Exception {
-                try {
-                    for (long progress = 0; progress < start; progress = end) {
-                        Thread.sleep(300);
-                        System.out.println(progress);
-                        updateProgress(progress, start);
-
-                    }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                return null;
-            }
-        };
-        //Progress bar starter
-        //ProgressBar slider = startProgressBar();
-        //slider.progressProperty().bind(progress.progressProperty());
-//----------------------------------------------------------------------------------------------------------------------
     }
 
     static String fileSize(Long size) {
@@ -368,19 +339,4 @@ public class SimpleXMLValidator extends Application {
         file.delete();
     }
 
-    public static ProgressBar startProgressBar() {
-        Stage primaryStage = new Stage();
-        ProgressBar pb = new ProgressBar(0);
-        ProgressIndicator pi = new ProgressIndicator(0);
-        pi.progressProperty().bind(pb.progressProperty());
-        HBox hb = new HBox();
-        hb.setSpacing(5);
-        hb.setAlignment(Pos.CENTER);
-        hb.getChildren().addAll(pb);
-        Scene scene = new Scene(hb, 300, 100);
-        primaryStage.setScene(scene);
-        primaryStage.setTitle("Downloading FTP Files ...");
-        primaryStage.show();
-        return pb;
-    }
 }
