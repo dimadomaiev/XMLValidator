@@ -27,8 +27,8 @@ public class SimpleXMLValidator extends Application {
 
     public static File schemaFile = null;
     public static File xmlFile = null;
-    public static List<File> pathForFiles;
     public static File pathToSelectedFiles = null;
+    public static List<File> pathForFiles;
     public static String tempFiles = "C:\\XMLValidator\\tempFiles\\";
     public static String invalidFiles = "C:\\XMLValidator\\invalidFiles\\";
     public static String selectedEnvironment = "";
@@ -131,7 +131,7 @@ public class SimpleXMLValidator extends Application {
                 String key = parts[0];
                 String value = parts[1];
                 envs.put(key, value);
-                System.out.println(value);
+                System.out.println("Set environment " + key + " = " + value);
                 environmentList.add(key);
             } else {
                 System.out.println("ignoring line: " + line);
@@ -200,12 +200,12 @@ public class SimpleXMLValidator extends Application {
                 baseFolder = "";
                 files = ftpClient.listFiles(baseFolder + manualDir + fasPrefix, filter);
                 System.out.println("manualDir - " + manualDir + "\n");
-                parseFTPFiles(ftpClient, manualDir, files, baseFolder, fasPrefix);
+                parseFTPFiles(ftpClient, manualDir, files, dirs, baseFolder, fasPrefix);
             }
         } else {
             files = ftpClient.listFiles(baseFolder + manualDir + fasPrefix, filter);
             System.out.println("manualDir - " + manualDir + "\n");
-            parseFTPFiles(ftpClient, manualDir, files, baseFolder, fasPrefix);
+            parseFTPFiles(ftpClient, manualDir, files, dirs, baseFolder, fasPrefix);
         }
 
         ftpClient.logout();
@@ -216,23 +216,31 @@ public class SimpleXMLValidator extends Application {
         System.out.println("Total elapsed time: " + elapsedTimeInMillis + " ms" + "\n");
     }
 
-    static void parseFTPFiles(FTPClient ftpClient, String dir, FTPFile[] files, String baseFolder, String fasPrefix) throws IOException {
+    static void parseFTPFiles(FTPClient ftpClient, String mDir, FTPFile[] files, FTPFile[] dirs, String baseFolder, String fasPrefix) throws IOException {
+        String remotePath;
         for (FTPFile file : files) {
             System.out.println("Downloading - " + file.getName() + " " + fileSize(file.getSize()));
             //DownloadZipFile
             mkDir(new File(new File(tempFiles + file.getName()).getParent()));
             OutputStream output = new FileOutputStream(tempFiles + file.getName());
-            ftpClient.retrieveFile(baseFolder + dir + fasPrefix + "/" + file.getName(), output);
+            ftpClient.retrieveFile(baseFolder + mDir + fasPrefix + "/" + file.getName(), output);
             output.close();
+        }
+        if (files.length==0 & manualDir.isEmpty()){
+            for (FTPFile dir : dirs) {
+                System.out.println("Dir name - " + dir.getName() + "\n");
+                remotePath = dir.getName();
+                ftpFileLoader(ftpClient, baseFolder + remotePath, tempFiles);
+            }
         }
     }
 
-    public static void selectTempFTPFiles(int stage) {
-        System.out.println(consoleToArea = ("\n" + "Get loaded files ..." + "\n"));
-        File folder = new File(tempFiles);
+    public static void selectFilesFromDir(String path) {
+        File folder = new File(path);
         File[] listOfFiles = folder.listFiles();
+        System.out.println("\n" + "Select files from " + folder + " ... \n");
 
-        if (stage == 1 & listOfFiles != null) {
+        if (folder.isDirectory() & listOfFiles != null) {
             for (File file : listOfFiles) {
                 if (file.isFile()) {
                     System.out.println(file.getName());
@@ -240,11 +248,8 @@ public class SimpleXMLValidator extends Application {
             }
             pathForFiles = Arrays.asList(listOfFiles);
         }
-        if (stage == 2) {
-            pathForFiles = Collections.singletonList(pathToSelectedFiles);
-        }
-        if (stage == 3) {
-            return;
+        if (!folder.isDirectory()) {
+            xmlFile = folder;
         }
     }
 
