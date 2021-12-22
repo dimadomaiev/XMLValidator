@@ -34,7 +34,7 @@ public class SimpleXMLValidator extends Application {
     public static String selectedEnvironment = "";
     public static String ftpBaseFolder = "";
     public static String ftpOther = "";
-    public static String otherFTPManualDir = null;
+    public static String otherFTPManualDir = "";
     public static String manualDir = "";
     public static String username = "free";
     public static String password = "free";
@@ -138,11 +138,12 @@ public class SimpleXMLValidator extends Application {
             }
         }
         envs.put("Other", ftpOther); //Other
+        environmentList.add("Other");
+        System.out.println(envs);
     }
 
     public static void ftpClient() throws IOException {
         System.out.println("\n" + "Connect... to FTP and Downloading files ... " + "\n");
-        long startTime = System.nanoTime();
         FTPClient ftpClient = new FTPClient();
         String env = null;
         for (String key : envs.keySet()) {
@@ -169,7 +170,7 @@ public class SimpleXMLValidator extends Application {
             if (key.equals(ftpBaseFolder)) {
                 baseFolder = baseFolders.get(key);
             }
-            if (!(otherFTPManualDir == null)) {
+            if (!(otherFTPManualDir.equals(""))) {
                 baseFolder = otherFTPManualDir;
             }
         }
@@ -189,31 +190,20 @@ public class SimpleXMLValidator extends Application {
                 ftpFileLoader(ftpClient, baseFolder + remotePath, tempFiles);
             }
         }
-        if (selectedEnvironment.equals("Other")) {
-            if (manualDir.isEmpty()) {
-                for (FTPFile dir : dirs) {
-                    System.out.println("Dir name - " + dir.getName() + "\n");
-                    remotePath = dir.getName();
-                    ftpFileLoader(ftpClient, baseFolder + remotePath, tempFiles);
-                }
-            } else {
-                baseFolder = "";
-                files = ftpClient.listFiles(baseFolder + manualDir + fasPrefix, filter);
-                System.out.println("manualDir - " + manualDir + "\n");
-                parseFTPFiles(ftpClient, manualDir, files, dirs, baseFolder, fasPrefix);
+        if (otherFTPManualDir.isEmpty() & selectedEnvironment.equals("Other")) {
+            for (FTPFile dir : dirs) {
+                System.out.println("Dir name - " + dir.getName() + "\n");
+                remotePath = dir.getName();
+                ftpFileLoader(ftpClient, baseFolder + remotePath, tempFiles);
             }
         } else {
+            baseFolder = "";
             files = ftpClient.listFiles(baseFolder + manualDir + fasPrefix, filter);
             System.out.println("manualDir - " + manualDir + "\n");
             parseFTPFiles(ftpClient, manualDir, files, dirs, baseFolder, fasPrefix);
         }
-
         ftpClient.logout();
         ftpClient.disconnect();
-
-        long endTime = System.nanoTime();
-        long elapsedTimeInMillis = TimeUnit.MILLISECONDS.convert((endTime - startTime), TimeUnit.NANOSECONDS);
-        System.out.println("Total elapsed time: " + elapsedTimeInMillis + " ms" + "\n");
     }
 
     static void parseFTPFiles(FTPClient ftpClient, String mDir, FTPFile[] files, FTPFile[] dirs, String baseFolder, String fasPrefix) throws IOException {
@@ -226,7 +216,7 @@ public class SimpleXMLValidator extends Application {
             ftpClient.retrieveFile(baseFolder + mDir + fasPrefix + "/" + file.getName(), output);
             output.close();
         }
-        if (files.length==0 & manualDir.isEmpty()){
+        if (files.length == 0 & manualDir.isEmpty()) {
             for (FTPFile dir : dirs) {
                 System.out.println("Dir name - " + dir.getName() + "\n");
                 remotePath = dir.getName();
