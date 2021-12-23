@@ -21,9 +21,9 @@
             <menus>
                 <Menu mnemonicParsing="false" text="Help">
                     <items>
-                        <MenuItem fx:id="invalidFilesWindow" mnemonicParsing="false" text="Invalid Files" />
-                        <SeparatorMenuItem mnemonicParsing="false" />
                         <MenuItem fx:id="linkToWiki" mnemonicParsing="false" text="Wiki Link" />
+                        <SeparatorMenuItem mnemonicParsing="false" />
+                        <MenuItem fx:id="invalidFilesWindow" mnemonicParsing="false" text="Invalid Files" />
                   <SeparatorMenuItem mnemonicParsing="false" />
                   <MenuItem fx:id="clearConsole" mnemonicParsing="false" text="Clear console and tempFolder" />
                     </items>

@@ -10,14 +10,12 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import org.apache.commons.net.ftp.FTPFileFilter;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -64,6 +62,8 @@ public class SimpleXMLValidator extends Application {
                 writer.println(";Это конфиг файл, в него можно добавлять собственное окружение(Environment) которое будет доступно для выбора ...");
                 writer.println(";Символ \" ; \" точка с запятой коментирует строку ... ");
                 writer.println(";Окружение должно быть задано разбитием строки через \" : \" двоеточие ...");
+                writer.println(";До\" : \" двоеточия задается название окружения в Выпадающем списке.");
+                writer.println(";После\" : \" двоеточия задается адрес окружения по которому будет производится авторизация на ФТП.");
                 writer.println(";Пример \"EIS1:eis.lanit.ru\" ");
                 writer.println(";Добавить свои окружения ниже прочерка. ");
                 writer.println(";После чего сохранить файл, скопировать, перезапустить приложение и подменить файл конфига. ");
@@ -160,7 +160,7 @@ public class SimpleXMLValidator extends Application {
         ftpClient.type(FTP.BINARY_FILE_TYPE);
         ftpClient.setControlEncoding("UTF-8");
 
-        String baseFolder = null;
+        String baseFolder = "";
         Map<String, String> baseFolders = new HashMap<>();
         baseFolders.put("fcs_nsi", "fcs_nsi/");
         baseFolders.put("fcs_fas", "fcs_fas/");
@@ -175,54 +175,21 @@ public class SimpleXMLValidator extends Application {
             }
         }
 
-        FTPFile[] files;
         FTPFile[] dirs = ftpClient.listDirectories(baseFolder);
-        FTPFileFilter filter = ftpFile -> (ftpFile.isFile() && ftpFile.getSize() > 22);
-        assert baseFolder != null;
         //Определяет, если выбрана проверка ФАС/ОВК, то добавляет каталог текущего месяца
-        String fasPrefix = (baseFolder.equals("fcs_fas/")) ? "/currMonth" : "";
+        String fasPrefix = (baseFolder.equals("fcs_fas/")) ? "/currMonth" : ""; // сейчас не работает...
         //в подкаталог "currMonth".
-        String remotePath;
-        if (manualDir.isEmpty() & !selectedEnvironment.equals("Other")) {
+        if ((manualDir.isEmpty() & !selectedEnvironment.equals("Other")) || (otherFTPManualDir.isEmpty() & selectedEnvironment.equals("Other"))) {
             for (FTPFile dir : dirs) {
                 System.out.println("Dir name - " + dir.getName() + "\n");
-                remotePath = dir.getName();
-                ftpFileLoader(ftpClient, baseFolder + remotePath, tempFiles);
-            }
-        }
-        if (otherFTPManualDir.isEmpty() & selectedEnvironment.equals("Other")) {
-            for (FTPFile dir : dirs) {
-                System.out.println("Dir name - " + dir.getName() + "\n");
-                remotePath = dir.getName();
-                ftpFileLoader(ftpClient, baseFolder + remotePath, tempFiles);
+                ftpFileLoader(ftpClient, baseFolder + dir.getName(), tempFiles);
             }
         } else {
-            baseFolder = "";
-            files = ftpClient.listFiles(baseFolder + manualDir + fasPrefix, filter);
             System.out.println("manualDir - " + manualDir + "\n");
-            parseFTPFiles(ftpClient, manualDir, files, dirs, baseFolder, fasPrefix);
+            ftpFileLoader(ftpClient, baseFolder + manualDir, tempFiles);
         }
         ftpClient.logout();
         ftpClient.disconnect();
-    }
-
-    static void parseFTPFiles(FTPClient ftpClient, String mDir, FTPFile[] files, FTPFile[] dirs, String baseFolder, String fasPrefix) throws IOException {
-        String remotePath;
-        for (FTPFile file : files) {
-            System.out.println("Downloading - " + file.getName() + " " + fileSize(file.getSize()));
-            //DownloadZipFile
-            mkDir(new File(new File(tempFiles + file.getName()).getParent()));
-            OutputStream output = new FileOutputStream(tempFiles + file.getName());
-            ftpClient.retrieveFile(baseFolder + mDir + fasPrefix + "/" + file.getName(), output);
-            output.close();
-        }
-        if (files.length == 0 & manualDir.isEmpty()) {
-            for (FTPFile dir : dirs) {
-                System.out.println("Dir name - " + dir.getName() + "\n");
-                remotePath = dir.getName();
-                ftpFileLoader(ftpClient, baseFolder + remotePath, tempFiles);
-            }
-        }
     }
 
     public static void selectFilesFromDir(String path) {
@@ -249,26 +216,19 @@ public class SimpleXMLValidator extends Application {
             Files.createDirectories(Paths.get(localPath));
         }
         System.out.println("Downloading folder " + remotePath + " to " + localPath);
-
         FTPFile[] remoteFiles = ftpClient.listFiles(remotePath);
-
         for (FTPFile remoteFile : remoteFiles) {
             if (!remoteFile.getName().equals(".") && !remoteFile.getName().equals("..")) {
                 String remoteFilePath = remotePath + "/" + remoteFile.getName();
                 String localFilePath = localPath + "/" + remoteFile.getName();
-
+                long emptyFile = remoteFile.getSize();
                 if (remoteFile.isDirectory()) {
                     new File(localFilePath).mkdirs();
-
                     ftpFileLoader(ftpClient, remoteFilePath, localFilePath);
                 } else {
-                    System.out.println("Downloading file " + remoteFilePath + " to " +
-                            localFilePath);
-
-                    OutputStream outputStream =
-                            new BufferedOutputStream(new FileOutputStream(localFilePath));
-                    if (!ftpClient.retrieveFile(remoteFilePath, outputStream)) {
-                        System.out.println("Failed to download file " + remoteFilePath);
+                    OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(localFilePath));
+                    if ((!ftpClient.retrieveFile(remoteFilePath, outputStream) | emptyFile >= 22)) {
+                        System.out.println("File is empty ... \n" + remoteFilePath);
                     }
                     outputStream.close();
                 }
@@ -371,5 +331,4 @@ public class SimpleXMLValidator extends Application {
         }
         file.delete();
     }
-
 }
