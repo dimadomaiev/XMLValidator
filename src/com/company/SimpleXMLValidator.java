@@ -38,6 +38,7 @@ public class SimpleXMLValidator extends Application {
     public static String password = "free";
     public static File ftpURL = new File("ftp://" + username + ":" + password + "@" + ftpOther);
     public static File configFile = new File("C:\\XMLValidator\\config.txt");
+    public static File logFile = new File("C:\\XMLValidator\\validationLog.txt");
     public static ObservableList<String> environmentList = FXCollections.observableArrayList();
     public static Map<String, String> envs = new HashMap<>();
 

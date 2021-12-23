@@ -27,6 +27,7 @@ import java.util.concurrent.TimeUnit;
 public class ValidatorController {
     public static String pathForSchema;
     public static String consoleToArea;
+    public static PrintWriter writer;
 
     @FXML
     private Tab localTab;
@@ -88,6 +89,7 @@ public class ValidatorController {
     void consoleArea() {
         console.appendText("\n" + consoleToArea);                                                                       //Добавляем текст в TextArea с сохранением
         console.setWrapText(true);                                                                                      //Выравнивать текст в область текстого поля
+        writeToLogFile();
     }
 
     @FXML
@@ -393,6 +395,7 @@ public class ValidatorController {
     }
 
     void deleteInvalidFilesAlert() {
+        SimpleXMLValidator.logFile.delete();
         File inv = new File(String.valueOf(SimpleXMLValidator.invalidFiles));
         if (inv.exists()) {
             //Delete old invalid files if Yes button pressed
@@ -408,10 +411,22 @@ public class ValidatorController {
         }
     }
 
+    public static void writeToLogFile() {
+        try {
+            writer = new PrintWriter((new FileWriter(SimpleXMLValidator.logFile, true)));
+            writer.println(consoleToArea);
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
     void logTime(Long startTime) {
         long endTime = System.nanoTime();
         long totalTimeInMilliseconds = TimeUnit.MILLISECONDS.convert((endTime - startTime), TimeUnit.NANOSECONDS);
         System.out.println(consoleToArea = "Time: " + totalTimeInMilliseconds / 1000 + " sec., or " + totalTimeInMilliseconds + " ms.\n");
         this.consoleArea();
     }
+
 }
