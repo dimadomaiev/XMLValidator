@@ -104,10 +104,12 @@ public class ValidatorController {
     private void initialize() {
         SimpleXMLValidator.deleteAllFilesWithDirs(new File(SimpleXMLValidator.tempFiles));
         deleteInvalidFilesAlert();
-
         SimpleXMLValidator.createConfigFile();
         try {
-            SimpleXMLValidator.initialEnvironments();
+            if (SimpleXMLValidator.envs.isEmpty()) {
+                SimpleXMLValidator.initialEnvironments();
+            }
+
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println(consoleToArea = "Error initial config file.\n" + e);
@@ -246,7 +248,9 @@ public class ValidatorController {
                     SimpleXMLValidator.manualDir = otherFTPManualDir.getText();
                     SimpleXMLValidator.ftpOther = ftpOtherURL.getText();
                     try {
-                        SimpleXMLValidator.initialEnvironments();
+                        if (SimpleXMLValidator.envs.isEmpty()) {
+                            SimpleXMLValidator.initialEnvironments();
+                        }
                     } catch (IOException e) {
                         e.printStackTrace();
                         System.out.println(consoleToArea = "Problem with initial environment ! ... \n" + e);

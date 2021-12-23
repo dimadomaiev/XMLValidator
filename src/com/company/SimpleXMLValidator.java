@@ -39,7 +39,7 @@ public class SimpleXMLValidator extends Application {
     public static File ftpURL = new File("ftp://" + username + ":" + password + "@" + ftpOther);
     public static File configFile = new File("C:\\XMLValidator\\config.txt");
     public static ObservableList<String> environmentList = FXCollections.observableArrayList();
-    public static Map<String, String> envs = null;
+    public static Map<String, String> envs = new HashMap<>();
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -122,7 +122,6 @@ public class SimpleXMLValidator extends Application {
     }
 
     public static void initialEnvironments() throws IOException {
-        envs = new HashMap<>();
         String line;
         BufferedReader reader = new BufferedReader(new FileReader(configFile));
         while ((line = reader.readLine()) != null) {
@@ -177,7 +176,7 @@ public class SimpleXMLValidator extends Application {
 
         FTPFile[] dirs = ftpClient.listDirectories(baseFolder);
         //Определяет, если выбрана проверка ФАС/ОВК, то добавляет каталог текущего месяца
-        String fasPrefix = (baseFolder.equals("fcs_fas/")) ? "/currMonth" : ""; // сейчас не работает...
+        //String fasPrefix = (baseFolder.equals("fcs_fas/")) ? "/currMonth" : ""; // сейчас не работает...
         //в подкаталог "currMonth".
         if ((manualDir.isEmpty() & !selectedEnvironment.equals("Other")) || (otherFTPManualDir.isEmpty() & selectedEnvironment.equals("Other"))) {
             for (FTPFile dir : dirs) {
