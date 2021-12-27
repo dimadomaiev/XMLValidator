@@ -258,7 +258,7 @@ public class SimpleXMLValidator extends Application {
         return "";
     }
 
-    public static boolean unzip(String zipFilePath, String destDirectory) throws IOException {
+    public static void unzip(String zipFilePath, String destDirectory) throws IOException {
         if (!Files.exists(Paths.get(destDirectory))) {
             Files.createDirectories(Paths.get(destDirectory));
         }
@@ -292,7 +292,6 @@ public class SimpleXMLValidator extends Application {
         } catch (IllegalArgumentException e) {
             consoleToArea = "Encoding error in to the Zip file - " + e;
         }
-        return false;
     }
 
     private static void extractFile(ZipInputStream zipIn, String filePath) throws IOException {
