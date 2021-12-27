@@ -219,20 +219,22 @@ public class SimpleXMLValidator extends Application {
         if (!Files.exists(Paths.get(localPath))) {
             Files.createDirectories(Paths.get(localPath));
         }
+
         System.out.println("Downloading folder " + remotePath + " to " + localPath);
         FTPFile[] remoteFiles = ftpClient.listFiles(remotePath);
         for (FTPFile remoteFile : remoteFiles) {
             if (!remoteFile.getName().equals(".") && !remoteFile.getName().equals("..")) {
                 String remoteFilePath = remotePath + "/" + remoteFile.getName();
-                String localFilePath = localPath + "/" + remoteFile.getName();
+                //String localFilePath = localPath + "/" + remoteFile.getName();
                 long emptyFile = remoteFile.getSize();
                 if (remoteFile.isDirectory()) {
-                    new File(localFilePath).mkdirs();
-                    ftpFileLoader(ftpClient, remoteFilePath, localFilePath);
+                    //new File(localFilePath).mkdirs();
+                    ftpFileLoader(ftpClient, remoteFilePath, localPath);
                 } else {
+                    String localFilePath = localPath + "/" + remoteFile.getName();
                     OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(localFilePath));
                     if ((!ftpClient.retrieveFile(remoteFilePath, outputStream) | emptyFile >= 22)) {
-                        System.out.println("File is empty ... \n" + remoteFilePath);
+                        System.out.println("File " + remoteFilePath + " is loaded ... \n");
                     }
                     outputStream.close();
                 }
@@ -256,7 +258,7 @@ public class SimpleXMLValidator extends Application {
         return "";
     }
 
-    public static void unzip(String zipFilePath, String destDirectory) throws IOException {
+    public static boolean unzip(String zipFilePath, String destDirectory) throws IOException {
         if (!Files.exists(Paths.get(destDirectory))) {
             Files.createDirectories(Paths.get(destDirectory));
         }
@@ -290,6 +292,7 @@ public class SimpleXMLValidator extends Application {
         } catch (IllegalArgumentException e) {
             consoleToArea = "Encoding error in to the Zip file - " + e;
         }
+        return false;
     }
 
     private static void extractFile(ZipInputStream zipIn, String filePath) throws IOException {

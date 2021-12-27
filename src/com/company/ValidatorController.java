@@ -250,9 +250,7 @@ public class ValidatorController {
                     SimpleXMLValidator.manualDir = otherFTPManualDir.getText();
                     SimpleXMLValidator.ftpOther = ftpOtherURL.getText();
                     try {
-
-                            SimpleXMLValidator.initialEnvironments();
-
+                        SimpleXMLValidator.initialEnvironments();
                     } catch (IOException e) {
                         e.printStackTrace();
                         System.out.println(consoleToArea = "Problem with initial environment ! ... \n" + e);
@@ -302,6 +300,7 @@ public class ValidatorController {
                 consoleToArea = ("\n" + "Unzipping loaded files ..." + "\n");
                 this.consoleArea();
                 long startUnzippingTime = System.nanoTime();
+
                 for (File pathForFile : SimpleXMLValidator.pathForFiles) {
                     if (pathForFile.getName().endsWith(".zip")) {
                         try {
@@ -314,6 +313,8 @@ public class ValidatorController {
                         }
                     }
                 }
+
+
                 logTime(startUnzippingTime);
                 SimpleXMLValidator.selectFilesFromDir(SimpleXMLValidator.tempFiles);
 //------------------------------------------------Unzipping-------------------------------------------------------------
