@@ -123,6 +123,10 @@ public class SimpleXMLValidator extends Application {
     }
 
     public static void initialEnvironments() throws IOException {
+        if (!envs.isEmpty()) {
+            envs.clear();
+            environmentList.clear();
+        }
         String line;
         BufferedReader reader = new BufferedReader(new FileReader(configFile));
         while ((line = reader.readLine()) != null) {

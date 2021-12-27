@@ -250,9 +250,9 @@ public class ValidatorController {
                     SimpleXMLValidator.manualDir = otherFTPManualDir.getText();
                     SimpleXMLValidator.ftpOther = ftpOtherURL.getText();
                     try {
-                        if (SimpleXMLValidator.envs.isEmpty()) {
+
                             SimpleXMLValidator.initialEnvironments();
-                        }
+
                     } catch (IOException e) {
                         e.printStackTrace();
                         System.out.println(consoleToArea = "Problem with initial environment ! ... \n" + e);
