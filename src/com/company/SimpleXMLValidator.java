@@ -234,7 +234,7 @@ public class SimpleXMLValidator extends Application {
                     String localFilePath = localPath + "/" + remoteFile.getName();
                     OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(localFilePath));
                     if ((!ftpClient.retrieveFile(remoteFilePath, outputStream) | emptyFile >= 22)) {
-                        System.out.println("File " + remoteFilePath + " is loaded ... \n");
+                        System.out.println("File : " + remoteFilePath + " - is loaded. \n");
                     }
                     outputStream.close();
                 }

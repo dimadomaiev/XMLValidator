@@ -30,6 +30,9 @@ public class ValidatorController {
     public static PrintWriter writer;
 
     @FXML
+    private ProgressIndicator indicator;
+
+    @FXML
     private Tab localTab;
 
     @FXML
@@ -117,7 +120,10 @@ public class ValidatorController {
             System.out.println(consoleToArea = "Error initial config file.\n" + e);
             this.consoleArea();
         }
-        Stage window = new Stage();                                                                                     // Инициализируем окно
+        // Инициализируем ProgressIndicator
+        indicator.setVisible(false);
+        // Инициализируем окно
+        Stage window = new Stage();
         environment.setItems(SimpleXMLValidator.environmentList);
         environment.setOnAction(actionEvent -> {
             ftpOtherURL.setVisible(environment.getValue().equals("Other"));
@@ -187,6 +193,7 @@ public class ValidatorController {
                 System.out.println(consoleToArea = "Copying file(s) to temp folder ...\n");
                 this.consoleArea();
                 long startLocalCopyingTime = System.nanoTime();
+                indicator.setVisible(true);
                 if (SimpleXMLValidator.pathForFiles == null & ((SimpleXMLValidator.xmlFile.getName().endsWith(".xml") | SimpleXMLValidator.xmlFile.getName().endsWith(".zip")))) {
                     try {
                         SimpleXMLValidator.copyFileUsingStream(SimpleXMLValidator.xmlFile, new File(SimpleXMLValidator.tempFiles + SimpleXMLValidator.xmlFile.getName()));
@@ -196,18 +203,22 @@ public class ValidatorController {
                 } else {
                     for (File pathForFile : SimpleXMLValidator.pathForFiles) {
                         try {
+
                             SimpleXMLValidator.copyFileUsingStream(pathForFile, new File(SimpleXMLValidator.tempFiles + pathForFile.getName()));
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
                     }
+
                 }
                 SimpleXMLValidator.selectFilesFromDir(SimpleXMLValidator.tempFiles);
+                indicator.setVisible(false);
                 logTime(startLocalCopyingTime);
 //----------------------------------------------------Unzipping---------------------------------------------------------
                 System.out.println(consoleToArea = "Unzipping file(s) from temp folder...\n");
                 this.consoleArea();
                 long startLocalUnzippingTime = System.nanoTime();
+                indicator.setVisible(true);
                 for (File pathForFile : SimpleXMLValidator.pathForFiles) {
                     if (pathForFile.getName().endsWith(".zip")) {
                         try {
@@ -216,6 +227,7 @@ public class ValidatorController {
                             e.printStackTrace();
                         }
                     }
+                    indicator.setVisible(false);
                 }
                 SimpleXMLValidator.selectFilesFromDir(SimpleXMLValidator.tempFiles);
                 logTime(startLocalUnzippingTime);
@@ -279,6 +291,7 @@ public class ValidatorController {
                 consoleToArea = ("\n" + "Connect ... and download FTP files ..." + "\n" + "It could take a lot of time, if end folder contains folders with files ...");
                 this.consoleArea();
                 long startLoadingTime = System.nanoTime();
+                indicator.setVisible(true);
                 try {
                     SimpleXMLValidator.ftpClient();
                     SimpleXMLValidator.selectFilesFromDir(SimpleXMLValidator.tempFiles);
@@ -289,6 +302,7 @@ public class ValidatorController {
                     this.consoleArea();
                     return;
                 }
+                indicator.setVisible(false);
                 logTime(startLoadingTime);
 //------------------------------------------------Check-if-temp-folder-is-empty-----------------------------------------
                 if (SimpleXMLValidator.pathForFiles == null) {
@@ -300,7 +314,7 @@ public class ValidatorController {
                 consoleToArea = ("\n" + "Unzipping loaded files ..." + "\n");
                 this.consoleArea();
                 long startUnzippingTime = System.nanoTime();
-
+                indicator.setVisible(true);
                 for (File pathForFile : SimpleXMLValidator.pathForFiles) {
                     if (pathForFile.getName().endsWith(".zip")) {
                         try {
@@ -313,7 +327,7 @@ public class ValidatorController {
                         }
                     }
                 }
-
+                indicator.setVisible(false);
 
                 logTime(startUnzippingTime);
                 SimpleXMLValidator.selectFilesFromDir(SimpleXMLValidator.tempFiles);
