@@ -188,7 +188,7 @@ public class ValidatorController {
                 this.consoleArea();
                 return;
             }
-//----------------------------------------------------Local-------------------------------------------------------------
+//----------------------------------------------------Local-Tab---------------------------------------------------------
             if (localTab.isSelected()) {
                 System.out.println(consoleToArea = "Copying file(s) to temp folder ...\n");
                 this.consoleArea();
@@ -199,14 +199,15 @@ public class ValidatorController {
                         SimpleXMLValidator.copyFileUsingStream(SimpleXMLValidator.xmlFile, new File(SimpleXMLValidator.tempFiles + SimpleXMLValidator.xmlFile.getName()));
                     } catch (IOException e) {
                         e.printStackTrace();
+                        indicator.setVisible(false);
                     }
                 } else {
                     for (File pathForFile : SimpleXMLValidator.pathForFiles) {
                         try {
-
                             SimpleXMLValidator.copyFileUsingStream(pathForFile, new File(SimpleXMLValidator.tempFiles + pathForFile.getName()));
                         } catch (IOException e) {
                             e.printStackTrace();
+                            indicator.setVisible(false);
                         }
                     }
 
@@ -225,6 +226,7 @@ public class ValidatorController {
                             SimpleXMLValidator.unzip(String.valueOf(pathForFile), SimpleXMLValidator.tempFiles);
                         } catch (IOException e) {
                             e.printStackTrace();
+                            indicator.setVisible(false);
                         }
                     }
                     indicator.setVisible(false);
@@ -250,30 +252,33 @@ public class ValidatorController {
             }
 //------------------------------------------------FTP-Tab---------------------------------------------------------------
             if (ftpTab.isSelected()) {
+//------------------------------------------------Not-Other-------------------------------------------------------------
+                if (!SimpleXMLValidator.selectedEnvironment.equals("Other")) {
+                    SimpleXMLValidator.selectedEnvironment = environment.getValue();
+                    SimpleXMLValidator.ftpBaseFolder = ftpBaseFolder.getValue();
+                    SimpleXMLValidator.manualDir = ftpManualDir.getText();
+                }
 //------------------------------------------------Get-schema-path-from-text-area----------------------------------------
                 if (!(schemaFilePath.getText().equals(""))) {
                     pathForSchema = schemaFilePath.getText();
                     SimpleXMLValidator.schemaFile = new File(schemaFilePath.getText());
                 }
 //------------------------------------------------Preparation-other-FTP-------------------------------------------------
-                SimpleXMLValidator.manualDir = ftpManualDir.getText();
+
                 if (SimpleXMLValidator.selectedEnvironment.equals("Other")) {
                     SimpleXMLValidator.otherFTPManualDir = otherFTPManualDir.getText();
                     SimpleXMLValidator.manualDir = otherFTPManualDir.getText();
                     SimpleXMLValidator.ftpOther = ftpOtherURL.getText();
-                    try {
-                        SimpleXMLValidator.initialEnvironments();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        System.out.println(consoleToArea = "Problem with initial environment ! ... \n" + e);
-                        this.consoleArea();
-                    }
-                    if (!(ftpLogin.getText().equals(""))) {
-                        SimpleXMLValidator.username = ftpLogin.getText();
-                    }
-                    if (!(ftpPassword.getText().equals(""))) {
-                        SimpleXMLValidator.password = ftpPassword.getText();
-                    }
+                    SimpleXMLValidator.username = ftpLogin.getText();
+                    SimpleXMLValidator.password = ftpPassword.getText();
+                }
+//------------------------------------------------Initial-Environments--------------------------------------------------
+                try {
+                    SimpleXMLValidator.initialEnvironments();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    System.out.println(consoleToArea = "Problem with initial environment ! ... \n" + e);
+                    this.consoleArea();
                 }
 //------------------------------------------------Check-necessary-fields------------------------------------------------
                 if ((SimpleXMLValidator.selectedEnvironment.isEmpty() | SimpleXMLValidator.ftpBaseFolder.equals("")) & !SimpleXMLValidator.selectedEnvironment.equals("Other")) {
@@ -294,16 +299,17 @@ public class ValidatorController {
                 indicator.setVisible(true);
                 try {
                     SimpleXMLValidator.ftpClient();
-                    SimpleXMLValidator.selectFilesFromDir(SimpleXMLValidator.tempFiles);
                 } catch (IOException e) {
                     e.printStackTrace();
                     System.out.println("Problem with connection to FTP. Error - " + e);
                     System.out.println(consoleToArea = "Please specify environment ! ... Or check VPN connection... \n Error: " + e);
                     this.consoleArea();
+                    indicator.setVisible(false);
                     return;
                 }
-                indicator.setVisible(false);
+                SimpleXMLValidator.selectFilesFromDir(SimpleXMLValidator.tempFiles);
                 logTime(startLoadingTime);
+                indicator.setVisible(false);
 //------------------------------------------------Check-if-temp-folder-is-empty-----------------------------------------
                 if (SimpleXMLValidator.pathForFiles == null) {
                     System.out.println(consoleToArea = "--------------------------------------------------- FTP End folder is empty!!! ... Or the path to the FTP files is incorrect ... ---------------------------------------------------");
@@ -323,15 +329,15 @@ public class ValidatorController {
                             e.printStackTrace();
                             System.out.println(consoleToArea = "Unpacking error ... " + e);
                             this.consoleArea();
+                            indicator.setVisible(false);
                             return;
                         }
                     }
                 }
                 indicator.setVisible(false);
-
                 logTime(startUnzippingTime);
                 SimpleXMLValidator.selectFilesFromDir(SimpleXMLValidator.tempFiles);
-//------------------------------------------------Unzipping-------------------------------------------------------------
+//------------------------------------------------Validating-------------------------------------------------------------
                 consoleToArea = ("\n" + "Validating ..." + "\n");
                 this.consoleArea();
                 long startValidatingTime = System.nanoTime();
@@ -348,7 +354,6 @@ public class ValidatorController {
                         }
                     }
                 }
-                //SimpleXMLValidator.selectFilesFromDir(3);
                 logTime(startValidatingTime);
             }
             consoleToArea = ("\n" + "----------------------------------------------------------------------------- !!! Verification completed !!! ------------------------------------------------------------------------");
@@ -391,13 +396,13 @@ public class ValidatorController {
             Schema schema = schemaFactory.newSchema(mySchemaFile);
             Validator validator = schema.newValidator();
             validator.validate(myXMLFile);
-            System.out.println(consoleToArea = (filePath.getName() + " - Size is: " + (new File(SimpleXMLValidator.fileSize(filePath.length()))) + " - IS VALID \n"));
+            System.out.println(consoleToArea = (filePath.getName() + " - Size is : " + (new File(SimpleXMLValidator.fileSize(filePath.length()))) + " - IS VALID \n"));
             this.consoleArea();
         } catch (SAXException | IOException e) {
             if (schemaPath == null || filePath == null) {
                 System.out.println(consoleToArea = "Please provide the path to the schema and/or XML file for validation!!!" + "\n");
             } else {
-                System.out.println(consoleToArea = (filePath.getName() + " - Size is: " + (new File(SimpleXMLValidator.fileSize(filePath.length()))) + " - IS NOT VALID." + "\n" + "Reason: " + e + "\n"));
+                System.out.println(consoleToArea = (filePath.getName() + " - Size is : " + (new File(SimpleXMLValidator.fileSize(filePath.length()))) + " - IS NOT VALID." + "\n" + "Reason : " + e + "\n"));
                 try {
                     SimpleXMLValidator.copyFileUsingStream(filePath, new File(SimpleXMLValidator.invalidFiles + filePath.getName()));
                 } catch (IOException ex) {
@@ -440,7 +445,7 @@ public class ValidatorController {
     void logTime(Long startTime) {
         long endTime = System.nanoTime();
         long totalTimeInMilliseconds = TimeUnit.MILLISECONDS.convert((endTime - startTime), TimeUnit.NANOSECONDS);
-        System.out.println(consoleToArea = "Time: " + totalTimeInMilliseconds / 1000 + " sec., or " + totalTimeInMilliseconds + " ms.\n");
+        System.out.println(consoleToArea = "Time: \n" + "sec.: " + totalTimeInMilliseconds / 1000 + "\nms.: " + totalTimeInMilliseconds);
         this.consoleArea();
     }
 

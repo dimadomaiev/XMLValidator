@@ -19,8 +19,6 @@ import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import static com.company.ValidatorController.consoleToArea;
-
 public class SimpleXMLValidator extends Application {
 
     public static File schemaFile = null;
@@ -34,8 +32,8 @@ public class SimpleXMLValidator extends Application {
     public static String ftpOther = "";
     public static String otherFTPManualDir = "";
     public static String manualDir = "";
-    public static String username = "free";
-    public static String password = "free";
+    public static String username = "";
+    public static String password = "";
     public static File ftpURL = new File("ftp://" + username + ":" + password + "@" + ftpOther);
     public static File configFile = new File("C:\\XMLValidator\\config.txt");
     public static File logFile = new File("C:\\XMLValidator\\validationLog.txt");
@@ -68,6 +66,10 @@ public class SimpleXMLValidator extends Application {
                 writer.println(";Пример \"EIS1:eis.lanit.ru\" ");
                 writer.println(";Добавить свои окружения ниже прочерка. ");
                 writer.println(";После чего сохранить файл, скопировать, перезапустить приложение и подменить файл конфига. ");
+                writer.println(";_________________________________");
+                writer.println(";Стандартный пароль для всех окружений кроме Other.");
+                writer.println(";username:free");
+                writer.println(";password:free");
                 writer.println(";_________________________________");
                 writer.println("EIS3:eis3.lanit.ru");
                 writer.println("EIS4:eis4.roskazna.ru");
@@ -137,6 +139,10 @@ public class SimpleXMLValidator extends Application {
                 envs.put(key, value);
                 System.out.println("Set environment " + key + " = " + value);
                 environmentList.add(key);
+            } else if(line.contains("username")){
+                username = parts[1];
+            } else if(line.contains("password")){
+                password = parts[1];
             } else {
                 System.out.println("ignoring line: " + line);
             }
@@ -157,6 +163,8 @@ public class SimpleXMLValidator extends Application {
         }
         System.out.println("Connect... to " + env);
         ftpClient.connect(env);
+        //Печатает подробную информацию о соединении с ФТП.
+        //tpClient.addProtocolCommandListener(new PrintCommandListener(new PrintWriter(System.out)));
         System.out.println("Connected.\nLogin...");
         ftpClient.login(username, password);
         System.out.println("Logged.");
@@ -193,7 +201,8 @@ public class SimpleXMLValidator extends Application {
             ftpFileLoader(ftpClient, baseFolder + manualDir, tempFiles);
         }
         ftpClient.logout();
-        ftpClient.disconnect();
+        System.out.println("Logout.");
+        //ftpClient.disconnect();
     }
 
     public static void selectFilesFromDir(String path) {
@@ -204,7 +213,7 @@ public class SimpleXMLValidator extends Application {
         if (folder.isDirectory() & listOfFiles != null) {
             for (File file : listOfFiles) {
                 if (file.isFile()) {
-                    System.out.println(file.getName());
+                    System.out.println(file.getName() + " - is selected.");
                 }
             }
             pathForFiles = Arrays.asList(listOfFiles);
@@ -290,7 +299,7 @@ public class SimpleXMLValidator extends Application {
             //Delete zip file
             Files.delete(Paths.get(zipFilePath));
         } catch (IllegalArgumentException e) {
-            consoleToArea = "Encoding error in to the Zip file - " + e;
+            System.out.println("Encoding error in to the Zip file - " + e);
         }
     }
 
