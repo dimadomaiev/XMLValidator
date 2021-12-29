@@ -38,7 +38,9 @@ public class SimpleXMLValidator extends Application {
     public static File configFile = new File("C:\\XMLValidator\\config.txt");
     public static File logFile = new File("C:\\XMLValidator\\validationLog.txt");
     public static ObservableList<String> environmentList = FXCollections.observableArrayList();
+    public static ObservableList<String> ftpBaseFolderList = FXCollections.observableArrayList("fcs_nsi", "fcs_fas", "fcs_rules", "fcs_regions");
     public static Map<String, String> envs = new HashMap<>();
+
 
     @Override
     public void start(Stage stage) throws IOException {

@@ -1,7 +1,5 @@
 package com.company;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
@@ -52,7 +50,6 @@ public class ValidatorController {
 
     @FXML
     private ChoiceBox<String> ftpBaseFolder;
-    ObservableList<String> ftpBaseFolderList = FXCollections.observableArrayList("fcs_nsi", "fcs_fas", "fcs_rules", "fcs_regions");
 
     @FXML
     private Text ftpBaseFolderText;
@@ -186,7 +183,7 @@ public class ValidatorController {
     }
 
     void initializeSelectedBaseFolder() {
-        ftpBaseFolder.setItems(ftpBaseFolderList);
+        ftpBaseFolder.setItems(SimpleXMLValidator.ftpBaseFolderList);
         ftpBaseFolder.setOnAction(actionEvent -> {
             SimpleXMLValidator.ftpBaseFolder = ftpBaseFolder.getValue();
             String bufferedBaseFolderValue = "";
