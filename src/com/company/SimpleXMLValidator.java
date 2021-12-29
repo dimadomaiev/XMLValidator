@@ -124,31 +124,41 @@ public class SimpleXMLValidator extends Application {
         }
     }
 
-    public static void initialEnvironments() throws IOException {
-        if (!envs.isEmpty()) {
-            envs.clear();
-            environmentList.clear();
-        }
+    public static void setDefaultLoinData() throws IOException {
         String line;
         BufferedReader reader = new BufferedReader(new FileReader(configFile));
         while ((line = reader.readLine()) != null) {
             String[] parts = line.split(":", 2);
-            if (parts.length >= 2 && !line.contains(";")) {
-                String key = parts[0];
-                String value = parts[1];
-                envs.put(key, value);
-                System.out.println("Set environment " + key + " = " + value);
-                environmentList.add(key);
-            } else if(line.contains("username")){
+            if (parts.length >= 2 && line.contains("username")) {
                 username = parts[1];
-            } else if(line.contains("password")){
+            } else if (parts.length >= 2 && line.contains("password")) {
                 password = parts[1];
-            } else {
-                System.out.println("ignoring line: " + line);
             }
         }
-        envs.put("Other", ftpOther); //Other
-        environmentList.add("Other");
+    }
+
+    public static void initialEnvironments() throws IOException {
+        String line;
+        BufferedReader reader = new BufferedReader(new FileReader(configFile));
+
+        if (envs.isEmpty()) {
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(":", 2);
+                if (parts.length >= 2 && !line.contains(";")) {
+                    String key = parts[0];
+                    String value = parts[1];
+                    envs.put(key, value);
+                    System.out.println("Add \"" + key + " = " + value + "\" to the Environment choice box.");
+                    environmentList.add(key);
+                }
+            }
+            envs.put("Other", ftpOther); //Other
+            environmentList.add("Other");
+        }
+        if (selectedEnvironment.equals("Other")) {
+            environmentList.remove("Other");
+            envs.put("Other", ftpOther); //Other
+        }
         System.out.println(envs);
     }
 
