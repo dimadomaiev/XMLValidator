@@ -26,6 +26,8 @@ public class ValidatorController {
     public static String pathForSchema;
     public static String consoleToArea;
     public static PrintWriter writer;
+    public int counterInvalidFiles = 0;
+    public int counterValidFiles = 0;
 
     @FXML
     private ProgressIndicator indicator;
@@ -100,7 +102,6 @@ public class ValidatorController {
 
     @FXML
     private MenuItem clearConsole;
-
 
     @FXML
     private void initialize() {
@@ -204,12 +205,14 @@ public class ValidatorController {
             Validator validator = schema.newValidator();
             validator.validate(myXMLFile);
             System.out.println(consoleToArea = (filePath.getName() + " - Size is : " + (new File(SimpleXMLValidator.fileSize(filePath.length()))) + " - IS VALID \n"));
+            counterValidFiles++;
             this.consoleArea();
         } catch (SAXException | IOException e) {
             if (schemaPath == null || filePath == null) {
                 System.out.println(consoleToArea = "Please provide the path to the schema and/or XML file for validation!!!" + "\n");
             } else {
                 System.out.println(consoleToArea = (filePath.getName() + " - Size is : " + (new File(SimpleXMLValidator.fileSize(filePath.length()))) + " - IS NOT VALID." + "\n" + "Reason : " + e + "\n"));
+                counterInvalidFiles++;
                 try {
                     SimpleXMLValidator.copyFileUsingStream(filePath, new File(SimpleXMLValidator.invalidFiles + filePath.getName()));
                 } catch (IOException ex) {
@@ -465,6 +468,8 @@ public class ValidatorController {
             logTime(startValidatingTime);
         }
         consoleToArea = ("\n" + "----------------------------------------------------------------------------- !!! Verification completed !!! ------------------------------------------------------------------------");
+        this.consoleArea();
+        System.out.print(consoleToArea = "Valid files - " + counterValidFiles + "\nInvalid files - " + counterInvalidFiles);
         this.consoleArea();
         consoleToArea = ("\n" + "----------------------------------------------------------- !!! Invalid files saved to: \"C:\\XMLValidator\\invalidFiles\" !!! -----------------------------------------------------------" + "\n");
         this.consoleArea();
