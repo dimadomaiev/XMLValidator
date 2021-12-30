@@ -201,7 +201,7 @@ public class SimpleXMLValidator extends Application {
 
         FTPFile[] dirs = ftpClient.listDirectories(baseFolder);
         //Определяет, если выбрана проверка ФАС/ОВК, то добавляет каталог текущего месяца
-        //String fasPrefix = (baseFolder.equals("fcs_fas/")) ? "/currMonth" : ""; // сейчас не работает...
+        //String prefix = (baseFolder.equals("fcs_fas/")) ? "/currMonth" : ""; // сейчас не работает...
         //в подкаталог "currMonth".
         if ((manualDir.isEmpty() & !selectedEnvironment.equals("Other")) || (otherFTPManualDir.isEmpty() & selectedEnvironment.equals("Other"))) {
             for (FTPFile dir : dirs) {
@@ -248,6 +248,16 @@ public class SimpleXMLValidator extends Application {
                 String remoteFilePath = remotePath + "/" + remoteFile.getName();
                 //String localFilePath = localPath + "/" + remoteFile.getName();
                 long emptyFile = remoteFile.getSize();
+                /*
+                Можно сделать фильтр для взятия файлов с ФТП не старше определённой даты.
+                Calendar fileCreationData =  remoteFile.getTimestamp();
+                System.out.println("File data - " + fileCreationData);
+                System.out.println("File time - " + fileCreationData.getTime());
+                String YEAR = "";
+                String MONTH = "";
+                String DAY_OF_MONTH = "";
+
+                */
                 if (remoteFile.isDirectory()) {
                     //new File(localFilePath).mkdirs();
                     ftpFileLoader(ftpClient, remoteFilePath, localPath);
