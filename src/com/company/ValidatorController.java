@@ -139,6 +139,10 @@ public class ValidatorController {
             SimpleXMLValidator.stageFile(window);
             this.setPromptXMLFilePath(SimpleXMLValidator.xmlFile);
         });
+        //Get prompt text for copy if mouse inside text field.
+        xmlFilePath.setOnMouseClicked(e -> xmlFilePath.setText(xmlFilePath.getPromptText()));
+        schemaFilePath.setOnMouseClicked(e -> schemaFilePath.setText(schemaFilePath.getPromptText()));
+
 //----------------------------------------------------Start Validation button-------------------------------------------
         startValidation.setOnAction(actionEvent -> {
             initializeSelectedEnvironment();
@@ -270,9 +274,8 @@ public class ValidatorController {
         }
 //Get file path from text field
         if (!(xmlFilePath.getText().equals(""))) {
-            SimpleXMLValidator.pathToSelectedFiles = new File(xmlFilePath.getText());
             SimpleXMLValidator.xmlFile = new File(xmlFilePath.getText());
-            SimpleXMLValidator.selectFilesFromDir(String.valueOf(SimpleXMLValidator.pathToSelectedFiles));
+            SimpleXMLValidator.selectFilesFromDir(String.valueOf(SimpleXMLValidator.xmlFile));
         }
 
         if (SimpleXMLValidator.pathForFiles == null & localTab.isSelected() & SimpleXMLValidator.xmlFile == null) {
@@ -295,7 +298,6 @@ public class ValidatorController {
         }
 //----------------------------------------------------Local-Tab---------------------------------------------------------
         if (localTab.isSelected()) {
-            System.out.println(consoleToArea = "Copying file(s) to temp folder ...\n");
             this.consoleArea();
             long startLocalCopyingTime = System.nanoTime();
             indicator.setVisible(true);
@@ -315,8 +317,8 @@ public class ValidatorController {
                         indicator.setVisible(false);
                     }
                 }
-
             }
+            System.out.println(consoleToArea = "File(s) copied to the temp folder ...\n");
             SimpleXMLValidator.selectFilesFromDir(SimpleXMLValidator.tempFiles);
             indicator.setVisible(false);
             logTime(startLocalCopyingTime);
@@ -334,15 +336,15 @@ public class ValidatorController {
                         indicator.setVisible(false);
                     }
                 }
-                indicator.setVisible(false);
             }
+            indicator.setVisible(false);
             SimpleXMLValidator.selectFilesFromDir(SimpleXMLValidator.tempFiles);
             logTime(startLocalUnzippingTime);
             //----------------------------------------------------Validating--------------------------------------------------------
             System.out.println(consoleToArea = "Validating ...\n");
             this.consoleArea();
             long startLocalValidatingTime = System.nanoTime();
-            this.setPromptXMLFilePath(new File(String.valueOf(SimpleXMLValidator.pathForFiles)));
+            this.setPromptXMLFilePath(new File(String.valueOf(SimpleXMLValidator.tempFiles)));
             for (File pathForFile : SimpleXMLValidator.pathForFiles) {
                 if (pathForFile.getName().endsWith(".xml")) {
                     try {
@@ -352,7 +354,7 @@ public class ValidatorController {
                     }
                 }
             }
-            SimpleXMLValidator.selectFilesFromDir(String.valueOf(SimpleXMLValidator.pathToSelectedFiles));
+            SimpleXMLValidator.selectFilesFromDir(String.valueOf(SimpleXMLValidator.xmlFile));
             logTime(startLocalValidatingTime);
         }
 //------------------------------------------------FTP-Tab---------------------------------------------------------------
@@ -473,7 +475,8 @@ public class ValidatorController {
         this.consoleArea();
         consoleToArea = ("\n" + "----------------------------------------------------------- !!! Invalid files saved to: \"C:\\XMLValidator\\invalidFiles\" !!! -----------------------------------------------------------" + "\n");
         this.consoleArea();
-        System.out.print("Total ");
+        System.out.print(consoleToArea = "Total time: ");
+        this.consoleArea();
         logTime(startTime);
     }
 }

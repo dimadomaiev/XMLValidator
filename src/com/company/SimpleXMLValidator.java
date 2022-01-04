@@ -23,7 +23,6 @@ public class SimpleXMLValidator extends Application {
 
     public static File schemaFile = null;
     public static File xmlFile = null;
-    public static File pathToSelectedFiles = null;
     public static List<File> pathForFiles;
     public static String tempFiles = "C:\\XMLValidator\\tempFiles\\";
     public static String invalidFiles = "C:\\XMLValidator\\invalidFiles\\";
@@ -108,8 +107,9 @@ public class SimpleXMLValidator extends Application {
         FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(
                 "XML files (*.xml;*.zip)", "*.xml", "*.zip"));// ,"*.7z","*.rar"));
-        if (pathToSelectedFiles != null) {
-            fileChooser.setInitialDirectory(new File(pathToSelectedFiles.getParent()));
+        //if (pathToSelectedFiles != null) {
+        if (xmlFile != null) {
+            fileChooser.setInitialDirectory(new File(xmlFile.getParent()));
         }
         //Запуск проводника на ФТП. Хз как реализовать пока что...
         if (selectedEnvironment.equals("Other")) {
@@ -119,8 +119,7 @@ public class SimpleXMLValidator extends Application {
         if (pathForFiles != null) {
             for (File pathForFile : pathForFiles) {
                 if (pathForFile != null) {
-                    pathToSelectedFiles = new File(pathForFile.getAbsolutePath());
-                    xmlFile = pathToSelectedFiles;
+                    xmlFile = new File(pathForFile.getAbsolutePath());
                 }
             }
         }
