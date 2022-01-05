@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
@@ -23,11 +24,17 @@
             <menus>
                 <Menu mnemonicParsing="false" text="Help">
                     <items>
-                        <MenuItem fx:id="linkToWiki" mnemonicParsing="false" text="Wiki Link" />
-                        <SeparatorMenuItem mnemonicParsing="false" />
-                        <MenuItem fx:id="invalidFilesWindow" mnemonicParsing="false" text="Invalid Files" />
                   <SeparatorMenuItem mnemonicParsing="false" />
-                  <MenuItem fx:id="clearConsole" mnemonicParsing="false" text="Clear console and tempFolder" />
+                        <MenuItem fx:id="linkToWiki" text="Wiki link" />
+                        <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem fx:id="clearConsole" mnemonicParsing="false" text="Clear console" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                        <MenuItem fx:id="invalidFilesWindow" mnemonicParsing="false" text="Invalid files" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem fx:id="moreOptions" mnemonicParsing="false" text="More options" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem fx:id="openConfigFile" text="Config file" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
                     </items>
                 </Menu>
             </menus>
@@ -62,11 +69,14 @@
                 </Tab>
             </tabs>
         </TabPane>
-        <AnchorPane prefHeight="404.0" prefWidth="889.0">
+        <AnchorPane fx:id="gettingDate" prefHeight="404.0" prefWidth="889.0">
             <children>
                 <Text layoutX="10.0" layoutY="30.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Schemes" textAlignment="CENTER" />
                 <Button fx:id="selectSchemaFile" layoutX="80.0" layoutY="10.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="100.0" text="Select Schemes" />
                 <TextField fx:id="schemaFilePath" layoutX="190.0" layoutY="10.0" prefHeight="25.0" prefWidth="680.0" promptText="Specify the path to the schema file. For example fcsExport.xsd" />
+            <CheckBox fx:id="onlyCurrMonthFolder" layoutX="80.0" layoutY="50.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="85.0" text="currMonth" visible="false" />
+            <CheckBox fx:id="startFromDateCheckBox" layoutX="180.0" layoutY="50.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="110.0" text="Younger date" visible="false" />
+            <TextField fx:id="dateGetFrom" layoutX="300.0" layoutY="50.0" prefHeight="25.0" prefWidth="80.0" promptText="dd.mm.yyyy" visible="false" />
                 <Button fx:id="startValidation" layoutX="400.0" layoutY="50.0" mnemonicParsing="false" onAction="#initialize" text="Start Validation" />
                 <TextArea fx:id="console" layoutY="100.0" prefHeight="400.0" prefWidth="900.0" />
             <ProgressIndicator fx:id="indicator" cache="true" layoutX="425.0" layoutY="230.0">

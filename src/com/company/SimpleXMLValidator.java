@@ -39,6 +39,7 @@ public class SimpleXMLValidator extends Application {
     public static ObservableList<String> environmentList = FXCollections.observableArrayList();
     public static ObservableList<String> ftpBaseFolderList = FXCollections.observableArrayList("fcs_nsi", "fcs_fas", "fcs_rules", "fcs_regions");
     public static Map<String, String> envs = new HashMap<>();
+    public static boolean uploadDateFrom = false;
 
 
     @Override
@@ -125,7 +126,7 @@ public class SimpleXMLValidator extends Application {
         }
     }
 
-    public static void setDefaultLoinData() throws IOException {
+    public static void setDefaultLoginData() throws IOException {
         String line;
         BufferedReader reader = new BufferedReader(new FileReader(configFile));
         while ((line = reader.readLine()) != null) {
@@ -263,7 +264,10 @@ public class SimpleXMLValidator extends Application {
                 } else {
                     String localFilePath = localPath + "/" + remoteFile.getName();
                     OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(localFilePath));
-                    if ((!ftpClient.retrieveFile(remoteFilePath, outputStream) | emptyFile >= 22)) {
+                    if ((!ftpClient.retrieveFile(remoteFilePath, outputStream) && emptyFile >= 22) && uploadDateFrom == false) {
+                        System.out.println("File : " + remoteFilePath + " - is loaded. \n");
+                    }
+                    if ((!ftpClient.retrieveFile(remoteFilePath, outputStream) && emptyFile >= 22) && uploadDateFrom == true) {
                         System.out.println("File : " + remoteFilePath + " - is loaded. \n");
                     }
                     outputStream.close();
