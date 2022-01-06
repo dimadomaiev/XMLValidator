@@ -15,6 +15,8 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -39,7 +41,7 @@ public class SimpleXMLValidator extends Application {
     public static ObservableList<String> environmentList = FXCollections.observableArrayList();
     public static ObservableList<String> ftpBaseFolderList = FXCollections.observableArrayList("fcs_nsi", "fcs_fas", "fcs_rules", "fcs_regions");
     public static Map<String, String> envs = new HashMap<>();
-    public static boolean uploadDateFrom = false;
+    public static String uploadDateFrom = "";
 
 
     @Override
@@ -240,36 +242,46 @@ public class SimpleXMLValidator extends Application {
         if (!Files.exists(Paths.get(localPath))) {
             Files.createDirectories(Paths.get(localPath));
         }
-
         System.out.println("Downloading folder " + remotePath + " to " + localPath);
         FTPFile[] remoteFiles = ftpClient.listFiles(remotePath);
         for (FTPFile remoteFile : remoteFiles) {
             if (!remoteFile.getName().equals(".") && !remoteFile.getName().equals("..")) {
                 String remoteFilePath = remotePath + "/" + remoteFile.getName();
-                //String localFilePath = localPath + "/" + remoteFile.getName();
                 long emptyFile = remoteFile.getSize();
-                /*
-                Можно сделать фильтр для взятия файлов с ФТП не старше определённой даты.
-                Calendar fileCreationData =  remoteFile.getTimestamp();
-                System.out.println("File data - " + fileCreationData);
-                System.out.println("File time - " + fileCreationData.getTime());
-                String YEAR = "";
-                String MONTH = "";
-                String DAY_OF_MONTH = "";
-
-                */
                 if (remoteFile.isDirectory()) {
-                    //new File(localFilePath).mkdirs();
                     ftpFileLoader(ftpClient, remoteFilePath, localPath);
-                } else {
-                    String localFilePath = localPath + "/" + remoteFile.getName();
+                }
+
+                String localFilePath = localPath + "/" + remoteFile.getName();
+                if (!uploadDateFrom.equals("")) {
+                    Calendar fileCreationData = remoteFile.getTimestamp();
+                    String dayOfMoth = String.valueOf(fileCreationData.get(Calendar.DAY_OF_MONTH));
+                    String month = String.valueOf(fileCreationData.get(Calendar.MONTH));
+                    String year = String.valueOf(fileCreationData.get(Calendar.YEAR));
+                    String strFileDate = dayOfMoth + "." + month + "." + year;
+                    System.out.println("strFileDate - " + strFileDate);
+                    SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
+                    try {
+                        Date fileDate = formatter.parse(strFileDate);
+                        System.out.println("fileDate - " + fileDate);
+                        Date customerDate = formatter.parse(uploadDateFrom);
+                        System.out.println("customerDate - " + customerDate);
+                        if (emptyFile >= 22 && fileDate.after(customerDate)) {
+                            OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(localFilePath));
+                            ftpClient.retrieveFile(remoteFilePath, outputStream);
+                            System.out.println("File : " + remoteFilePath + " - is loaded. \n");
+                            outputStream.close();
+                        }
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                        System.out.println("Invalid date format :" + e);
+                        return;
+                    }
+                }
+                if (emptyFile >= 22 && uploadDateFrom.equals("")) {
                     OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(localFilePath));
-                    if ((!ftpClient.retrieveFile(remoteFilePath, outputStream) && emptyFile >= 22) && uploadDateFrom == false) {
-                        System.out.println("File : " + remoteFilePath + " - is loaded. \n");
-                    }
-                    if ((!ftpClient.retrieveFile(remoteFilePath, outputStream) && emptyFile >= 22) && uploadDateFrom == true) {
-                        System.out.println("File : " + remoteFilePath + " - is loaded. \n");
-                    }
+                    ftpClient.retrieveFile(remoteFilePath, outputStream);
+                    System.out.println("File : " + remoteFilePath + " - is loaded. \n");
                     outputStream.close();
                 }
             }

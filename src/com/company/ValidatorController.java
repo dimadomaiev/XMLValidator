@@ -29,7 +29,6 @@ public class ValidatorController {
     public int counterInvalidFiles = 0;
     public int counterValidFiles = 0;
 
-
     //----------------------------------------------------MenuItem------------------------------------------------------
     @FXML
     private MenuItem invalidFilesWindow;
@@ -89,10 +88,16 @@ public class ValidatorController {
     private TextField schemaFilePath;
 
     @FXML
+    private Separator separator1;
+
+    @FXML
     private CheckBox onlyCurrMonthFolder;
 
     @FXML
-    private CheckBox startFromDateCheckBox;
+    private Separator separator2;
+
+    @FXML
+    private Text youngerThanDate;
 
     @FXML
     private TextField dateGetFrom;
@@ -105,7 +110,6 @@ public class ValidatorController {
 
     @FXML
     private ProgressIndicator indicator;
-
     //----------------------------------------------------initialize----------------------------------------------------
     @FXML
     private void initialize() {
@@ -127,7 +131,7 @@ public class ValidatorController {
         indicator.setVisible(false);
         // Инициализируем окно
         Stage window = new Stage();
-        initializeSelectedBaseFolder();
+        initializeSpecifyOptions();
         //Задаем действие на кнопку selectSchemaFile
         selectSchemaFile.setOnAction(actionEvent -> {
             schemaFilePath.clear();
@@ -149,7 +153,10 @@ public class ValidatorController {
 
         //----------------------------------------------------Start Validation button-----------------------------------
         startValidation.setOnAction(actionEvent -> {
+            counterInvalidFiles = 0;
+            counterValidFiles = 0;
             initializeSelectedEnvironment();
+            initializeSpecifyOptions();
             new Thread(this::run).start();
         });
         //------------------------------------------------Initial-open-folder-------------------------------------------
@@ -178,7 +185,6 @@ public class ValidatorController {
         clearConsole.setOnAction(actionEvent -> {
             console.clear();
             SimpleXMLValidator.deleteAllFilesWithDirs(new File(SimpleXMLValidator.tempFiles));
-
         });
         //------------------------------------------------Initial-linkToWiki-button-in-help-menu------------------------
         linkToWiki.setOnAction(actionEvent -> {
@@ -188,8 +194,10 @@ public class ValidatorController {
 
         moreOptions.setOnAction(event -> {
             onlyCurrMonthFolder.setVisible(!onlyCurrMonthFolder.isVisible() && ftpTab.isSelected());
-            startFromDateCheckBox.setVisible(!startFromDateCheckBox.isVisible() && ftpTab.isSelected());
+            youngerThanDate.setVisible(!youngerThanDate.isVisible() && ftpTab.isSelected());
             dateGetFrom.setVisible(!dateGetFrom.isVisible() && ftpTab.isSelected());
+            separator1.setVisible(!separator1.isVisible() && ftpTab.isSelected());
+            separator2.setVisible(!separator2.isVisible() && ftpTab.isSelected());
         });
 
     }
@@ -228,7 +236,7 @@ public class ValidatorController {
     }
 
     //Выпадающий список BaseFolder
-    void initializeSelectedBaseFolder() {
+    void initializeSpecifyOptions() {
         ftpBaseFolder.setItems(SimpleXMLValidator.ftpBaseFolderList);
         ftpBaseFolder.setOnAction(actionEvent -> {
             SimpleXMLValidator.ftpBaseFolder = ftpBaseFolder.getValue();
@@ -237,6 +245,10 @@ public class ValidatorController {
                 ftpManualDir.clear();
             }
         });
+        SimpleXMLValidator.uploadDateFrom = dateGetFrom.getText();
+        if (!dateGetFrom.isVisible()) {
+            dateGetFrom.clear();
+        }
     }
 
     //Метод валидации
@@ -439,9 +451,6 @@ public class ValidatorController {
                 this.consoleArea();
             }
 
-            if (startFromDateCheckBox.isVisible() && ftpTab.isSelected()) {
-                SimpleXMLValidator.uploadDateFrom = true;
-            }
             //------------------------------------------------Check-necessary-fields------------------------------------
             if ((SimpleXMLValidator.selectedEnvironment.isEmpty() | SimpleXMLValidator.ftpBaseFolder.equals("")) & !SimpleXMLValidator.selectedEnvironment.equals("Other")) {
                 System.out.println(consoleToArea = "Please specify environment and base folder! ...");
@@ -459,6 +468,7 @@ public class ValidatorController {
             this.consoleArea();
             long startLoadingTime = System.nanoTime();
             indicator.setVisible(true);
+            SimpleXMLValidator.uploadDateFrom = dateGetFrom.getText();
             try {
                 SimpleXMLValidator.ftpClient();
             } catch (IOException e) {
