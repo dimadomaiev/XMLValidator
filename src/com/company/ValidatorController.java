@@ -28,7 +28,6 @@ public class ValidatorController {
     public static PrintWriter writer;
     public int counterInvalidFiles = 0;
     public int counterValidFiles = 0;
-
     //----------------------------------------------------MenuItem------------------------------------------------------
     @FXML
     private MenuItem invalidFilesWindow;
@@ -44,6 +43,9 @@ public class ValidatorController {
 
     @FXML
     private MenuItem openConfigFile;
+
+    @FXML
+    private MenuItem openValidationLogFile;
     //----------------------------------------------------localTab------------------------------------------------------
     @FXML
     private Tab localTab;
@@ -121,7 +123,6 @@ public class ValidatorController {
             if (SimpleXMLValidator.envs.isEmpty()) {
                 SimpleXMLValidator.initialEnvironments();
             }
-
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println(consoleToArea = "Error initial config file.\n" + e);
@@ -140,7 +141,6 @@ public class ValidatorController {
             //Задаем в промте поля путь к выбранному файлу
             this.setPromptSchemaFilePath(SimpleXMLValidator.schemaFile);
         });
-
         //По аналогии со схемами
         selectXMLFile.setOnAction(actionEvent -> {
             xmlFilePath.clear();
@@ -150,13 +150,12 @@ public class ValidatorController {
         //Get prompt text for copy if mouse inside text field.
         xmlFilePath.setOnMouseClicked(e -> xmlFilePath.setText(xmlFilePath.getPromptText()));
         schemaFilePath.setOnMouseClicked(e -> schemaFilePath.setText(schemaFilePath.getPromptText()));
-
         //----------------------------------------------------Start Validation button-----------------------------------
         startValidation.setOnAction(actionEvent -> {
             counterInvalidFiles = 0;
             counterValidFiles = 0;
             initializeSelectedEnvironment();
-            initializeSpecifyOptions();
+            initializeSpecifyOptions(); //отловить ошибку для "Other" и датой ФТП файла
             new Thread(this::run).start();
         });
         //------------------------------------------------Initial-open-folder-------------------------------------------
@@ -181,6 +180,17 @@ public class ValidatorController {
                     }
                 }
         );
+        //------------------------------------------------Initial-open-logFile------------------------------------------
+        openValidationLogFile.setOnAction(actionEvent -> {
+                    try {
+                        Desktop.getDesktop().open(SimpleXMLValidator.logFile);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        System.out.println(consoleToArea = "Error opening logFile ... \n" + e);
+                        this.consoleArea();
+                    }
+                }
+        );
         //------------------------------------------------Initial-clearConsole-button-in-help-menu----------------------
         clearConsole.setOnAction(actionEvent -> {
             console.clear();
@@ -191,7 +201,7 @@ public class ValidatorController {
             consoleToArea = "Sorry for inconvenience." + "\n" + "Wiki page does not exist at this moment.";
             this.consoleArea();
         });
-
+        //Отображаем/прячем объекты по событию на moreOptions в меню help
         moreOptions.setOnAction(event -> {
             onlyCurrMonthFolder.setVisible(!onlyCurrMonthFolder.isVisible() && ftpTab.isSelected());
             youngerThanDate.setVisible(!youngerThanDate.isVisible() && ftpTab.isSelected());
@@ -201,24 +211,20 @@ public class ValidatorController {
         });
 
     }
-
     //Добавляем текст в TextArea с сохранением
     void consoleArea() {
         console.appendText("\n" + consoleToArea);
         console.setWrapText(true);
         writeToLogFile();
     }
-
     //Устанавливаем путь к файлу в поле после выбора файла
     void setPromptXMLFilePath(File file) {
         xmlFilePath.setPromptText(String.valueOf(file));
     }
-
     //Устанавливаем путь к файлу в поле после выбора схемы
     void setPromptSchemaFilePath(File file) {
         schemaFilePath.setPromptText(String.valueOf(file));
     }
-
     //Убираем и добавляем элементы для работы с окружением "Other"
     void initializeSelectedEnvironment() {
         environment.setItems(SimpleXMLValidator.environmentList);
@@ -234,7 +240,6 @@ public class ValidatorController {
             SimpleXMLValidator.selectedEnvironment = environment.getValue();
         });
     }
-
     //Выпадающий список BaseFolder
     void initializeSpecifyOptions() {
         ftpBaseFolder.setItems(SimpleXMLValidator.ftpBaseFolderList);
@@ -250,7 +255,6 @@ public class ValidatorController {
             dateGetFrom.clear();
         }
     }
-
     //Метод валидации
     void validate(File schemaPath, File filePath) throws IOException {
 
@@ -281,7 +285,6 @@ public class ValidatorController {
             this.consoleArea();
         }
     }
-
     //Уведомление при запуске программы. Появляется если присутствует каталог с невалидными файлами
     void deleteInvalidFilesAlert() {
         SimpleXMLValidator.logFile.delete();
@@ -299,7 +302,6 @@ public class ValidatorController {
             }
         }
     }
-
     //Запись коссоли в лог файл
     public static void writeToLogFile() {
         try {
@@ -311,7 +313,6 @@ public class ValidatorController {
         }
 
     }
-
     //Вывод времени
     void logTime(Long startTime) {
         long endTime = System.nanoTime();
@@ -319,7 +320,6 @@ public class ValidatorController {
         System.out.println(consoleToArea = "Time: \n" + "sec.: " + totalTimeInMilliseconds / 1000 + "\nms.: " + totalTimeInMilliseconds);
         this.consoleArea();
     }
-
     //Зауск Треды
     private void run() {
         long startTime = System.nanoTime();
@@ -421,12 +421,18 @@ public class ValidatorController {
                 SimpleXMLValidator.selectedEnvironment = environment.getValue();
                 SimpleXMLValidator.ftpBaseFolder = ftpBaseFolder.getValue();
                 SimpleXMLValidator.manualDir = ftpManualDir.getText();
+                SimpleXMLValidator.uploadDateFrom = dateGetFrom.getText();
+                if (!dateGetFrom.isVisible()) {
+                    dateGetFrom.clear();
+                }
+
                 try {
                     SimpleXMLValidator.setDefaultLoginData();
                 } catch (IOException e) {
                     e.printStackTrace();
                     System.out.println("Problem with colling the setDefaultLoinData method ... " + e);
                 }
+
             }
             //------------------------------------------------Get-schema-path-from-text-area----------------------------
             if (!(schemaFilePath.getText().equals(""))) {
@@ -441,6 +447,16 @@ public class ValidatorController {
                 SimpleXMLValidator.ftpOther = ftpOtherURL.getText();
                 SimpleXMLValidator.username = ftpLogin.getText();
                 SimpleXMLValidator.password = ftpPassword.getText();
+                SimpleXMLValidator.uploadDateFrom = dateGetFrom.getText();
+                if (!dateGetFrom.isVisible()) {
+                    dateGetFrom.clear();
+                }
+                try {
+                    SimpleXMLValidator.setDefaultLoginData();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    System.out.println("Problem with colling the setDefaultLoinData method ... " + e);
+                }
             }
             //------------------------------------------------Initial-Environments--------------------------------------
             try {

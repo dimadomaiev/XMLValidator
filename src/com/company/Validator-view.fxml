@@ -36,6 +36,8 @@
                   <SeparatorMenuItem mnemonicParsing="false" />
                   <MenuItem fx:id="openConfigFile" text="Config file" />
                   <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem fx:id="openValidationLogFile" text="log file" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
                     </items>
                 </Menu>
             </menus>

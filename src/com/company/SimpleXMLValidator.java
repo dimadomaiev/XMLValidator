@@ -33,6 +33,7 @@ public class SimpleXMLValidator extends Application {
     public static String ftpOther = "";
     public static String otherFTPManualDir = "";
     public static String manualDir = "";
+    public static String prefixDir = "";
     public static String username = "";
     public static String password = "";
     public static File ftpURL = new File("ftp://" + username + ":" + password + "@" + ftpOther);
@@ -160,7 +161,7 @@ public class SimpleXMLValidator extends Application {
             environmentList.add("Other");
         }
         if (selectedEnvironment.equals("Other")) {
-            environmentList.remove("Other");
+            //environmentList.remove("Other");
             envs.put("Other", ftpOther); //Other
         }
         System.out.println(envs);
@@ -196,24 +197,57 @@ public class SimpleXMLValidator extends Application {
             if (key.equals(ftpBaseFolder)) {
                 baseFolder = baseFolders.get(key);
             }
-            if (!(otherFTPManualDir.equals(""))) {
-                baseFolder = otherFTPManualDir;
+
+            if (selectedEnvironment.equals("Other")) {
+                baseFolder = manualDir;
+
+                if (baseFolder.startsWith("/")) {
+                    System.out.println("Удаление 1-го символа строки: ");
+                    System.out.println("baseFolder до - " + baseFolder);
+                    baseFolder = baseFolder.substring(1);
+                    System.out.println("baseFolder после - " + baseFolder);
+                }
             }
+
         }
 
-        FTPFile[] dirs = ftpClient.listDirectories(baseFolder);
-        //Определяет, если выбрана проверка ФАС/ОВК, то добавляет каталог текущего месяца
-        //String prefix = (baseFolder.equals("fcs_fas/")) ? "/currMonth" : ""; // сейчас не работает...
-        //в подкаталог "currMonth".
-        if ((manualDir.isEmpty() & !selectedEnvironment.equals("Other")) || (otherFTPManualDir.isEmpty() & selectedEnvironment.equals("Other"))) {
+        if (!selectedEnvironment.equals("Other")) {
+            FTPFile[] dirs = ftpClient.listDirectories(baseFolder + manualDir);
+            for (FTPFile dir : dirs) {
+                System.out.println("Dir name - " + dir.getName() + "\n");
+                ftpFileLoader(ftpClient, baseFolder + manualDir + "/" + dir.getName(), tempFiles);
+            }
+        }
+        if (selectedEnvironment.equals("Other")) {
+            FTPFile[] dirs = ftpClient.listDirectories(baseFolder);
+            for (FTPFile dir : dirs) {
+                System.out.println("Dir name - " + dir.getName() + "\n");
+                ftpFileLoader(ftpClient, baseFolder + "/" + dir.getName(), tempFiles);
+            }
+        } else {
+            System.out.println(ValidatorController.consoleToArea = "Is not match required conditions in the method 'ftpClient'.");
+            return;
+        }
+
+        /*
+        if ((FTPManualDir.isEmpty() & !selectedEnvironment.equals("Other"))) {
             for (FTPFile dir : dirs) {
                 System.out.println("Dir name - " + dir.getName() + "\n");
                 ftpFileLoader(ftpClient, baseFolder + dir.getName(), tempFiles);
             }
-        } else {
-            System.out.println("manualDir - " + manualDir + "\n");
-            ftpFileLoader(ftpClient, baseFolder + manualDir, tempFiles);
         }
+        if ((otherFTPManualDir.isEmpty() & selectedEnvironment.equals("Other"))) {
+            for (FTPFile dir : dirs) {
+                System.out.println("Dir name - " + dir.getName() + "\n");
+                ftpFileLoader(ftpClient, baseFolder + dir.getName(), tempFiles);
+            }
+        }
+        if (!FTPManualDir.isEmpty()) {
+            System.out.println("manualDir - " + FTPManualDir + "\n");
+            ftpFileLoader(ftpClient, baseFolder + FTPManualDir, tempFiles);
+        }
+        */
+
         ftpClient.logout();
         System.out.println("Logout.");
         //ftpClient.disconnect();
@@ -251,21 +285,18 @@ public class SimpleXMLValidator extends Application {
                 if (remoteFile.isDirectory()) {
                     ftpFileLoader(ftpClient, remoteFilePath, localPath);
                 }
-
                 String localFilePath = localPath + "/" + remoteFile.getName();
                 if (!uploadDateFrom.equals("")) {
                     Calendar fileCreationData = remoteFile.getTimestamp();
                     String dayOfMoth = String.valueOf(fileCreationData.get(Calendar.DAY_OF_MONTH));
-                    String month = String.valueOf(fileCreationData.get(Calendar.MONTH));
+                    int calendarMonth = fileCreationData.get(Calendar.MONTH);
+                    int increaseMoth = calendarMonth + 1;
+                    String month = String.valueOf(increaseMoth);
                     String year = String.valueOf(fileCreationData.get(Calendar.YEAR));
-                    String strFileDate = dayOfMoth + "." + month + "." + year;
-                    System.out.println("strFileDate - " + strFileDate);
                     SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
                     try {
-                        Date fileDate = formatter.parse(strFileDate);
-                        System.out.println("fileDate - " + fileDate);
+                        Date fileDate = formatter.parse(dayOfMoth + "." + month + "." + year);
                         Date customerDate = formatter.parse(uploadDateFrom);
-                        System.out.println("customerDate - " + customerDate);
                         if (emptyFile >= 22 && fileDate.after(customerDate)) {
                             OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(localFilePath));
                             ftpClient.retrieveFile(remoteFilePath, outputStream);
