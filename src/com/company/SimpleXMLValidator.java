@@ -199,31 +199,39 @@ public class SimpleXMLValidator extends Application {
             }
 
             if (selectedEnvironment.equals("Other")) {
-                baseFolder = manualDir;
+                baseFolder = otherFTPManualDir;
+                manualDir = "";
 
                 if (baseFolder.startsWith("/")) {
-                    System.out.println("Удаление 1-го символа строки: ");
-                    System.out.println("baseFolder до - " + baseFolder);
+                    //System.out.println("Удаление 1-го символа строки: ");
+                    //System.out.println("baseFolder до - " + baseFolder);
                     baseFolder = baseFolder.substring(1);
-                    System.out.println("baseFolder после - " + baseFolder);
+                    //System.out.println("baseFolder после - " + baseFolder);
                 }
             }
 
         }
+        FTPFile[] dirs = ftpClient.listDirectories(baseFolder + manualDir);
+        //System.out.println(dirs.length);
 
-        if (!selectedEnvironment.equals("Other")) {
-            FTPFile[] dirs = ftpClient.listDirectories(baseFolder + manualDir);
+        if (!selectedEnvironment.equals("Other") && !(dirs.length == 0)) {
+            //FTPFile[] dirs = ftpClient.listDirectories(baseFolder + manualDir);
             for (FTPFile dir : dirs) {
                 System.out.println("Dir name - " + dir.getName() + "\n");
                 ftpFileLoader(ftpClient, baseFolder + manualDir + "/" + dir.getName(), tempFiles);
             }
         }
-        if (selectedEnvironment.equals("Other")) {
-            FTPFile[] dirs = ftpClient.listDirectories(baseFolder);
+        if (selectedEnvironment.equals("Other") && !(dirs.length == 0)) {
+            // FTPFile[] dirs = ftpClient.listDirectories(baseFolder);
             for (FTPFile dir : dirs) {
                 System.out.println("Dir name - " + dir.getName() + "\n");
                 ftpFileLoader(ftpClient, baseFolder + "/" + dir.getName(), tempFiles);
             }
+
+        }
+        if (dirs.length == 0) {
+            System.out.println("Dir name - " + baseFolder + "\n");
+            ftpFileLoader(ftpClient, baseFolder  + manualDir, tempFiles);
         } else {
             System.out.println(ValidatorController.consoleToArea = "Is not match required conditions in the method 'ftpClient'.");
             return;
@@ -269,6 +277,9 @@ public class SimpleXMLValidator extends Application {
         if (!folder.isDirectory()) {
             xmlFile = folder;
         }
+        if (listOfFiles.length == 0){
+            System.out.println(ValidatorController.consoleToArea = "Temp folder is empty!");
+        }
     }
 
     private static void ftpFileLoader(FTPClient ftpClient, String remotePath, String localPath) throws IOException {
@@ -276,6 +287,13 @@ public class SimpleXMLValidator extends Application {
         if (!Files.exists(Paths.get(localPath))) {
             Files.createDirectories(Paths.get(localPath));
         }
+        /*
+        File dirChecker = new File(remotePath);
+        if (dirChecker.isDirectory()) {
+            ftpFileLoader(ftpClient, remoteFilePath, localPath);
+        }
+         */
+
         System.out.println("Downloading folder " + remotePath + " to " + localPath);
         FTPFile[] remoteFiles = ftpClient.listFiles(remotePath);
         for (FTPFile remoteFile : remoteFiles) {
@@ -297,7 +315,7 @@ public class SimpleXMLValidator extends Application {
                     try {
                         Date fileDate = formatter.parse(dayOfMoth + "." + month + "." + year);
                         Date customerDate = formatter.parse(uploadDateFrom);
-                        if (emptyFile >= 22 && fileDate.after(customerDate)) {
+                        if (emptyFile > 22 && fileDate.after(customerDate)) {
                             OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(localFilePath));
                             ftpClient.retrieveFile(remoteFilePath, outputStream);
                             System.out.println("File : " + remoteFilePath + " - is loaded. \n");

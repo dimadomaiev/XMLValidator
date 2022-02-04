@@ -4,9 +4,9 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 import org.xml.sax.SAXException;
 
@@ -25,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 public class ValidatorController {
     public static String pathForSchema;
     public static String consoleToArea;
+    public static String controllerOfConsoleToArea;
     public static PrintWriter writer;
     public int counterInvalidFiles = 0;
     public int counterValidFiles = 0;
@@ -107,11 +108,18 @@ public class ValidatorController {
     @FXML
     private Button startValidation;
 
+    //@FXML
+    //private TextArea console;
+
     @FXML
-    private TextArea console;
+    private TextFlow textFlow;
+
+    @FXML
+    private ListView<String> listView;
 
     @FXML
     private ProgressIndicator indicator;
+
     //----------------------------------------------------initialize----------------------------------------------------
     @FXML
     private void initialize() {
@@ -128,6 +136,7 @@ public class ValidatorController {
             System.out.println(consoleToArea = "Error initial config file.\n" + e);
             this.consoleArea();
         }
+        //TextFlow textFlow = new TextFlow();
         // Инициализируем ProgressIndicator
         indicator.setVisible(false);
         // Инициализируем окно
@@ -156,7 +165,17 @@ public class ValidatorController {
             counterValidFiles = 0;
             initializeSelectedEnvironment();
             initializeSpecifyOptions(); //отловить ошибку для "Other" и датой ФТП файла
-            new Thread(this::run).start();
+            new Thread(this::runn).start();
+/*
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    runn();
+                }
+            });
+
+
+ */
         });
         //------------------------------------------------Initial-open-folder-------------------------------------------
         invalidFilesWindow.setOnAction(actionEvent -> {
@@ -164,7 +183,7 @@ public class ValidatorController {
                         Desktop.getDesktop().open(new File(SimpleXMLValidator.invalidFiles));
                     } catch (IOException e) {
                         e.printStackTrace();
-                        System.out.println(consoleToArea = "Error opening invalidFiles folder ... \n" + e);
+                        System.out.println(consoleToArea = "Error opening invalidFiles folder ... \n Directory 'invalidFiles' can be not exist." + e);
                         this.consoleArea();
                     }
                 }
@@ -193,12 +212,12 @@ public class ValidatorController {
         );
         //------------------------------------------------Initial-clearConsole-button-in-help-menu----------------------
         clearConsole.setOnAction(actionEvent -> {
-            console.clear();
+            //console.clear();
             SimpleXMLValidator.deleteAllFilesWithDirs(new File(SimpleXMLValidator.tempFiles));
         });
         //------------------------------------------------Initial-linkToWiki-button-in-help-menu------------------------
         linkToWiki.setOnAction(actionEvent -> {
-            consoleToArea = "Sorry for inconvenience." + "\n" + "Wiki page does not exist at this moment.";
+            System.out.println(consoleToArea = "Sorry for inconvenience." + "\n" + "Wiki page does not exist at this moment.");
             this.consoleArea();
         });
         //Отображаем/прячем объекты по событию на moreOptions в меню help
@@ -211,20 +230,25 @@ public class ValidatorController {
         });
 
     }
+
     //Добавляем текст в TextArea с сохранением
     void consoleArea() {
-        console.appendText("\n" + consoleToArea);
-        console.setWrapText(true);
+        //console.appendText("\n" + consoleToArea);
+        //console.setWrapText(true);
         writeToLogFile();
+        //flowText();
     }
+
     //Устанавливаем путь к файлу в поле после выбора файла
     void setPromptXMLFilePath(File file) {
         xmlFilePath.setPromptText(String.valueOf(file));
     }
+
     //Устанавливаем путь к файлу в поле после выбора схемы
     void setPromptSchemaFilePath(File file) {
         schemaFilePath.setPromptText(String.valueOf(file));
     }
+
     //Убираем и добавляем элементы для работы с окружением "Other"
     void initializeSelectedEnvironment() {
         environment.setItems(SimpleXMLValidator.environmentList);
@@ -240,6 +264,7 @@ public class ValidatorController {
             SimpleXMLValidator.selectedEnvironment = environment.getValue();
         });
     }
+
     //Выпадающий список BaseFolder
     void initializeSpecifyOptions() {
         ftpBaseFolder.setItems(SimpleXMLValidator.ftpBaseFolderList);
@@ -255,6 +280,7 @@ public class ValidatorController {
             dateGetFrom.clear();
         }
     }
+
     //Метод валидации
     void validate(File schemaPath, File filePath) throws IOException {
 
@@ -285,6 +311,7 @@ public class ValidatorController {
             this.consoleArea();
         }
     }
+
     //Уведомление при запуске программы. Появляется если присутствует каталог с невалидными файлами
     void deleteInvalidFilesAlert() {
         SimpleXMLValidator.logFile.delete();
@@ -302,26 +329,25 @@ public class ValidatorController {
             }
         }
     }
+
+    void flowText() {
+        textFlow.getChildren().add(new Text(consoleToArea));
+    }
+
     //Запись коссоли в лог файл
-    public static void writeToLogFile() {
+    void writeToLogFile() {
         try {
             writer = new PrintWriter((new FileWriter(SimpleXMLValidator.logFile, true)));
             writer.println(consoleToArea);
             writer.close();
-        } catch (IOException e) {
+            listView.getItems().add(consoleToArea);
+        } catch (IOException | IllegalStateException e) {
             e.printStackTrace();
         }
+    }
 
-    }
-    //Вывод времени
-    void logTime(Long startTime) {
-        long endTime = System.nanoTime();
-        long totalTimeInMilliseconds = TimeUnit.MILLISECONDS.convert((endTime - startTime), TimeUnit.NANOSECONDS);
-        System.out.println(consoleToArea = "Time: \n" + "sec.: " + totalTimeInMilliseconds / 1000 + "\nms.: " + totalTimeInMilliseconds);
-        this.consoleArea();
-    }
     //Зауск Треды
-    private void run() {
+    public void runn() {
         long startTime = System.nanoTime();
         SimpleXMLValidator.deleteAllFilesWithDirs(new File(SimpleXMLValidator.tempFiles));
         //Get schema path from text field
@@ -332,7 +358,12 @@ public class ValidatorController {
         //Get file path from text field
         if (!(xmlFilePath.getText().equals(""))) {
             SimpleXMLValidator.xmlFile = new File(xmlFilePath.getText());
+            controllerOfConsoleToArea = consoleToArea;
             SimpleXMLValidator.selectFilesFromDir(String.valueOf(SimpleXMLValidator.xmlFile));
+            if (!controllerOfConsoleToArea.equals(consoleToArea)) {
+                System.out.println("Getting file path from text field - controllerOfConsoleToArea - " + consoleToArea);
+                this.consoleArea();
+            }
         }
 
         if (SimpleXMLValidator.pathForFiles == null & localTab.isSelected() & SimpleXMLValidator.xmlFile == null) {
@@ -376,7 +407,12 @@ public class ValidatorController {
                 }
             }
             System.out.println(consoleToArea = "File(s) copied to the temp folder ...\n");
+            controllerOfConsoleToArea = consoleToArea;
             SimpleXMLValidator.selectFilesFromDir(SimpleXMLValidator.tempFiles);
+            if (!controllerOfConsoleToArea.equals(consoleToArea)) {
+                System.out.println("Local-Tab - controllerOfConsoleToArea" + consoleToArea);
+                this.consoleArea();
+            }
             indicator.setVisible(false);
             logTime(startLocalCopyingTime);
             //----------------------------------------------------Unzipping---------------------------------------------
@@ -395,7 +431,13 @@ public class ValidatorController {
                 }
             }
             indicator.setVisible(false);
+            controllerOfConsoleToArea = consoleToArea;
             SimpleXMLValidator.selectFilesFromDir(SimpleXMLValidator.tempFiles);
+            if (!controllerOfConsoleToArea.equals(consoleToArea)) {
+                System.out.println("Unzipping - controllerOfConsoleToArea - " + consoleToArea);
+                this.consoleArea();
+                return;
+            }
             logTime(startLocalUnzippingTime);
             //----------------------------------------------------Validating--------------------------------------------
             System.out.println(consoleToArea = "Validating ...\n");
@@ -411,7 +453,12 @@ public class ValidatorController {
                     }
                 }
             }
+            controllerOfConsoleToArea = consoleToArea;
             SimpleXMLValidator.selectFilesFromDir(String.valueOf(SimpleXMLValidator.xmlFile));
+            if (!controllerOfConsoleToArea.equals(consoleToArea)) {
+                System.out.println("Validating - controllerOfConsoleToArea - " + consoleToArea);
+                this.consoleArea();
+            }
             logTime(startLocalValidatingTime);
         }
         //------------------------------------------------FTP-Tab-------------------------------------------------------
@@ -443,7 +490,7 @@ public class ValidatorController {
 
             if (SimpleXMLValidator.selectedEnvironment.equals("Other")) {
                 SimpleXMLValidator.otherFTPManualDir = otherFTPManualDir.getText();
-                SimpleXMLValidator.manualDir = otherFTPManualDir.getText();
+                //SimpleXMLValidator.manualDir = otherFTPManualDir.getText();
                 SimpleXMLValidator.ftpOther = ftpOtherURL.getText();
                 SimpleXMLValidator.username = ftpLogin.getText();
                 SimpleXMLValidator.password = ftpPassword.getText();
@@ -480,7 +527,7 @@ public class ValidatorController {
                 return;
             }
             //------------------------------------------------ftpClient-------------------------------------------------
-            consoleToArea = ("\n" + "Connect ... and download FTP files ..." + "\n" + "It could take a lot of time, if end folder contains folders with files ...");
+            System.out.println(consoleToArea = ("\n" + "Connect ... and download FTP files ..." + "\n" + "It could take a lot of time, if end folder contains folders with files ..."));
             this.consoleArea();
             long startLoadingTime = System.nanoTime();
             indicator.setVisible(true);
@@ -495,7 +542,11 @@ public class ValidatorController {
                 indicator.setVisible(false);
                 return;
             }
+            controllerOfConsoleToArea = consoleToArea;
             SimpleXMLValidator.selectFilesFromDir(SimpleXMLValidator.tempFiles);
+            if (!controllerOfConsoleToArea.equals(consoleToArea)) {
+                this.consoleArea();
+            }
             logTime(startLoadingTime);
             indicator.setVisible(false);
             //------------------------------------------------Check-if-temp-folder-is-empty-----------------------------
@@ -505,7 +556,7 @@ public class ValidatorController {
                 return;
             }
             //------------------------------------------------Unzipping-------------------------------------------------
-            consoleToArea = ("\n" + "Unzipping loaded files ..." + "\n");
+            System.out.println(consoleToArea = ("\n" + "Unzipping loaded files ..." + "\n"));
             this.consoleArea();
             long startUnzippingTime = System.nanoTime();
             indicator.setVisible(true);
@@ -524,9 +575,14 @@ public class ValidatorController {
             }
             indicator.setVisible(false);
             logTime(startUnzippingTime);
+            controllerOfConsoleToArea = consoleToArea;
             SimpleXMLValidator.selectFilesFromDir(SimpleXMLValidator.tempFiles);
+            if (!controllerOfConsoleToArea.equals(consoleToArea)) {
+                System.out.println("Unzipping - controllerOfConsoleToArea - " + consoleToArea);
+                this.consoleArea();
+            }
             //------------------------------------------------Validating------------------------------------------------
-            consoleToArea = ("\n" + "Validating ..." + "\n");
+            System.out.println(consoleToArea = ("\n" + "Validating ..." + "\n"));
             this.consoleArea();
             long startValidatingTime = System.nanoTime();
             this.setPromptXMLFilePath(new File(SimpleXMLValidator.tempFiles));
@@ -544,14 +600,22 @@ public class ValidatorController {
             }
             logTime(startValidatingTime);
         }
-        consoleToArea = ("\n" + "----------------------------------------------------------------------------- !!! Verification completed !!! ------------------------------------------------------------------------");
+        System.out.println(consoleToArea = ("\n" + "----------------------------------------------------------------------------- !!! Verification completed !!! ------------------------------------------------------------------------"));
         this.consoleArea();
-        System.out.print(consoleToArea = "Valid files - " + counterValidFiles + "\nInvalid files - " + counterInvalidFiles);
+        System.out.print(consoleToArea = "Valid files - " + counterValidFiles + "\nInvalid files - " + counterInvalidFiles + "\n");
         this.consoleArea();
-        consoleToArea = ("\n" + "----------------------------------------------------------- !!! Invalid files saved to: \"C:\\XMLValidator\\invalidFiles\" !!! -----------------------------------------------------------" + "\n");
+        System.out.println(consoleToArea = ("\n" + "----------------------------------------------------------- !!! Invalid files saved to: \"C:\\XMLValidator\\invalidFiles\" !!! -----------------------------------------------------------" + "\n"));
         this.consoleArea();
         System.out.print(consoleToArea = "Total time: ");
         this.consoleArea();
         logTime(startTime);
+    }
+
+    //Вывод времени
+    void logTime(Long startTime) {
+        long endTime = System.nanoTime();
+        long totalTimeInMilliseconds = TimeUnit.MILLISECONDS.convert((endTime - startTime), TimeUnit.NANOSECONDS);
+        System.out.println(consoleToArea = "Time: \n" + "sec.: " + totalTimeInMilliseconds / 1000 + "\nms.: " + totalTimeInMilliseconds);
+        this.consoleArea();
     }
 }
