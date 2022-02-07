@@ -33,7 +33,6 @@ public class SimpleXMLValidator extends Application {
     public static String ftpOther = "";
     public static String otherFTPManualDir = "";
     public static String manualDir = "";
-    public static String prefixDir = "";
     public static String username = "";
     public static String password = "";
     public static File ftpURL = new File("ftp://" + username + ":" + password + "@" + ftpOther);
@@ -41,7 +40,7 @@ public class SimpleXMLValidator extends Application {
     public static File logFile = new File("C:\\XMLValidator\\validationLog.txt");
     public static ObservableList<String> environmentList = FXCollections.observableArrayList();
     public static ObservableList<String> ftpBaseFolderList = FXCollections.observableArrayList("fcs_nsi", "fcs_fas", "fcs_rules", "fcs_regions");
-    public static Map<String, String> envs = new HashMap<>();
+    public static Map<String, String> environments = new HashMap<>();
     public static String uploadDateFrom = "";
 
 
@@ -146,34 +145,34 @@ public class SimpleXMLValidator extends Application {
         String line;
         BufferedReader reader = new BufferedReader(new FileReader(configFile));
 
-        if (envs.isEmpty()) {
+        if (environments.isEmpty()) {
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(":", 2);
                 if (parts.length >= 2 && !line.contains(";")) {
                     String key = parts[0];
                     String value = parts[1];
-                    envs.put(key, value);
+                    environments.put(key, value);
                     System.out.println("Add \"" + key + " = " + value + "\" to the Environment choice box.");
                     environmentList.add(key);
                 }
             }
-            envs.put("Other", ftpOther); //Other
+            environments.put("Other", ftpOther); //Other
             environmentList.add("Other");
         }
         if (selectedEnvironment.equals("Other")) {
             //environmentList.remove("Other");
-            envs.put("Other", ftpOther); //Other
+            environments.put("Other", ftpOther); //Other
         }
-        System.out.println(envs);
+        System.out.println(environments);
     }
 
     public static void ftpClient() throws IOException {
         System.out.println("\n" + "Connect... to FTP and Downloading files ... " + "\n");
         FTPClient ftpClient = new FTPClient();
         String env = null;
-        for (String key : envs.keySet()) {
+        for (String key : environments.keySet()) {
             if (key.equals(selectedEnvironment)) {
-                env = envs.get(key);
+                env = environments.get(key);
             }
         }
         System.out.println("Connect... to " + env);

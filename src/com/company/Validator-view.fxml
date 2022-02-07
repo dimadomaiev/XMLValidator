@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.Menu?>
@@ -19,99 +18,69 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0"
-      prefWidth="900.0" xmlns="http://javafx.com/javafx/1.8" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.company.ValidatorController">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.company.ValidatorController">
     <MenuBar VBox.vgrow="NEVER">
         <Menu mnemonicParsing="false" text="File">
-            <SeparatorMenuItem mnemonicParsing="false"/>
-            <MenuItem fx:id="clearConsole" mnemonicParsing="false" text="Clear console"/>
-            <SeparatorMenuItem mnemonicParsing="false"/>
+            <SeparatorMenuItem mnemonicParsing="false" />
+            <MenuItem fx:id="clearConsole" mnemonicParsing="false" text="Clear console" />
+            <SeparatorMenuItem mnemonicParsing="false" />
         </Menu>
         <Menu mnemonicParsing="false" text="Edit">
-            <SeparatorMenuItem mnemonicParsing="false"/>
-            <MenuItem fx:id="moreOptions" mnemonicParsing="false" text="More options"/>
-            <SeparatorMenuItem mnemonicParsing="false"/>
-            <MenuItem fx:id="openConfigFile" text="Config file"/>
-            <SeparatorMenuItem mnemonicParsing="false"/>
+            <SeparatorMenuItem mnemonicParsing="false" />
+            <MenuItem fx:id="takeFilesOlderThanDate" mnemonicParsing="false" text="Date older" />
+            <SeparatorMenuItem mnemonicParsing="false" />
+            <MenuItem fx:id="openConfigFile" text="Config file" />
+            <SeparatorMenuItem mnemonicParsing="false" />
         </Menu>
         <Menu mnemonicParsing="false" text="View">
-            <SeparatorMenuItem mnemonicParsing="false"/>
-            <MenuItem fx:id="invalidFilesWindow" mnemonicParsing="false" text="Invalid files"/>
-            <SeparatorMenuItem mnemonicParsing="false"/>
-            <MenuItem fx:id="openValidationLogFile" text="log file"/>
-            <SeparatorMenuItem mnemonicParsing="false"/>
+            <SeparatorMenuItem mnemonicParsing="false" />
+            <MenuItem fx:id="invalidFilesWindow" mnemonicParsing="false" text="Invalid files" />
+            <SeparatorMenuItem mnemonicParsing="false" />
+            <MenuItem fx:id="openValidationLogFile" text="log file" />
+            <SeparatorMenuItem mnemonicParsing="false" />
         </Menu>
         <Menu mnemonicParsing="false" text="Help">
-            <SeparatorMenuItem mnemonicParsing="false"/>
-            <MenuItem fx:id="linkToWiki" text="Wiki link"/>
-            <SeparatorMenuItem mnemonicParsing="false"/>
+            <SeparatorMenuItem mnemonicParsing="false" />
+            <MenuItem fx:id="linkToWiki" text="Wiki link" />
+            <SeparatorMenuItem mnemonicParsing="false" />
         </Menu>
     </MenuBar>
     <TabPane prefHeight="80.0" prefWidth="900.0" tabClosingPolicy="UNAVAILABLE">
         <Tab fx:id="localTab" text="Local Tab">
             <AnchorPane prefHeight="51.0" prefWidth="882.0">
-                <Text layoutX="10.0" layoutY="32.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Files"
-                      textAlignment="CENTER"/>
-                <Button fx:id="selectXMLFile" layoutX="80.0" layoutY="15.0" mnemonicParsing="false"
-                        prefWidth="100.0" text="Select a File(s)"/>
-                <TextField layoutX="189.0" layoutY="15.0" prefHeight="26.0" prefWidth="680.0"
-                           promptText="Specify the path to &quot;.xml&quot; or &quot;.zip&quot; file(s) for validation according to the .xsd schema."
-                           fx:id="xmlFilePath"/>
+                <Text layoutX="10.0" layoutY="32.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Files" textAlignment="CENTER" />
+                <Button fx:id="selectXMLFile" layoutX="80.0" layoutY="15.0" mnemonicParsing="false" prefWidth="100.0" text="Select a File(s)" />
+                <TextField layoutX="189.0" layoutY="15.0" prefHeight="26.0" prefWidth="680.0" promptText="Specify the path to &quot;.xml&quot; or &quot;.zip&quot; file(s) for validation according to the .xsd schema." fx:id="xmlFilePath" />
             </AnchorPane>
         </Tab>
         <Tab fx:id="ftpTab" text="FTP Tab">
             <AnchorPane prefHeight="450.0" prefWidth="900.0">
-                <Text layoutX="10.0" layoutY="32.0" strokeType="OUTSIDE" strokeWidth="0.0"
-                      text="Environment"/>
-                <ChoiceBox fx:id="environment" layoutX="80.0" layoutY="15.0" prefHeight="25.0"
-                           prefWidth="100.0" snapToPixel="false"/>
-                <Text fx:id="ftpBaseFolderText" layoutX="190.0" layoutY="32.0" strokeType="OUTSIDE"
-                      strokeWidth="0.0" text="Base folder"/>
-                <ChoiceBox fx:id="ftpBaseFolder" layoutX="255.0" layoutY="15.0" prefHeight="25.0"
-                           prefWidth="100.0" snapToPixel="false"/>
-                <TextField fx:id="ftpManualDir" layoutX="370.0" layoutY="15.0" prefHeight="25.0"
-                           prefWidth="500.0"
-                           promptText="Specify the path from the Base folder to the folder for validate."/>
-                <TextField fx:id="ftpLogin" layoutX="191.0" layoutY="15.0" prefHeight="25.0"
-                           prefWidth="80.0" promptText="Login" visible="false"/>
-                <PasswordField fx:id="ftpPassword" layoutX="280.0" layoutY="15.0" prefHeight="25.0"
-                               prefWidth="80.0" promptText="Pass" visible="false"/>
-                <TextField fx:id="ftpOtherURL" layoutX="365.0" layoutY="15.0" prefHeight="25.0"
-                           prefWidth="220.0" promptText="FTP Environment" visible="false"/>
-                <TextField fx:id="otherFTPManualDir" layoutX="595.0" layoutY="15.0" prefHeight="25.0"
-                           prefWidth="275.0" promptText="FTP target directory for validate."
-                           visible="false"/>
+                <Text layoutX="10.0" layoutY="32.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Environment" />
+                <ChoiceBox fx:id="environment" layoutX="80.0" layoutY="15.0" prefHeight="25.0" prefWidth="100.0" snapToPixel="false" />
+                <Text fx:id="ftpBaseFolderText" layoutX="190.0" layoutY="32.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Base folder" />
+                <ChoiceBox fx:id="ftpBaseFolder" layoutX="255.0" layoutY="15.0" prefHeight="25.0" prefWidth="100.0" snapToPixel="false" />
+                <TextField fx:id="ftpManualDir" layoutX="370.0" layoutY="15.0" prefHeight="25.0" prefWidth="500.0" promptText="Specify the path from the Base folder to the folder for validate." />
+                <TextField fx:id="ftpLogin" layoutX="191.0" layoutY="15.0" prefHeight="25.0" prefWidth="80.0" promptText="Login" visible="false" />
+                <PasswordField fx:id="ftpPassword" layoutX="280.0" layoutY="15.0" prefHeight="25.0" prefWidth="80.0" promptText="Pass" visible="false" />
+                <TextField fx:id="ftpOtherURL" layoutX="365.0" layoutY="15.0" prefHeight="25.0" prefWidth="220.0" promptText="FTP Environment" visible="false" />
+                <TextField fx:id="otherFTPManualDir" layoutX="595.0" layoutY="15.0" prefHeight="25.0" prefWidth="275.0" promptText="FTP target directory for validate." visible="false" />
             </AnchorPane>
         </Tab>
     </TabPane>
     <AnchorPane fx:id="gettingDate" prefHeight="404.0" prefWidth="889.0">
-        <Text layoutX="10.0" layoutY="30.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Schemes"
-              textAlignment="CENTER"/>
-        <Button fx:id="selectSchemaFile" layoutX="80.0" layoutY="10.0" mnemonicParsing="false" prefHeight="25.0"
-                prefWidth="100.0" text="Select Schemes"/>
-        <TextField fx:id="schemaFilePath" layoutX="190.0" layoutY="10.0" prefHeight="25.0" prefWidth="680.0"
-                   promptText="Specify the path to the schema file. For example fcsExport.xsd"/>
-        <Separator fx:id="separator1" layoutX="77.0" layoutY="49.0" orientation="VERTICAL" prefHeight="25.0"
-                   prefWidth="6.0" visible="false"/>
-        <CheckBox fx:id="onlyCurrMonthFolder" layoutX="90.0" layoutY="50.0" mnemonicParsing="false"
-                  prefHeight="25.0" prefWidth="85.0" text="currMonth" visible="false"/>
-        <Separator layoutX="187.0" layoutY="49.0" orientation="VERTICAL" prefHeight="25.0"
-                   prefWidth="6.0" visible="false"/>
-        <Text fx:id="youngerThanDate" layoutX="195.0" layoutY="66.0" strokeType="OUTSIDE" strokeWidth="0.0"
-              text="Younger than date" textAlignment="CENTER" visible="false"/>
-        <TextField fx:id="dateGetFrom" layoutX="300.0" layoutY="50.0" prefHeight="25.0" prefWidth="80.0"
-                   promptText="dd.MM.yyyy" visible="false"/>
-        <Separator layoutX="390.0" layoutY="50.0" orientation="VERTICAL" prefHeight="25.0"
-                   prefWidth="6.0"/>
-        <Button fx:id="startValidation" layoutX="400.0" layoutY="50.0" mnemonicParsing="false"
-                onAction="#initialize" prefWidth="100.0" text="Start Validation"/>
-        <Separator layoutX="505.0" layoutY="50.0" orientation="VERTICAL" prefHeight="25.0"
-                   prefWidth="6.0"/>
-        <ListView fx:id="listView" layoutY="90.0" prefHeight="400.0" prefWidth="900.0"/>
+        <Text layoutX="10.0" layoutY="30.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Schemes" textAlignment="CENTER" />
+        <Button fx:id="selectSchemaFile" layoutX="80.0" layoutY="10.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="100.0" text="Select Schemes" />
+        <TextField fx:id="schemaFilePath" layoutX="190.0" layoutY="10.0" prefHeight="25.0" prefWidth="680.0" promptText="Specify the path to the schema file. For example fcsExport.xsd" />
+        <Separator layoutX="187.0" layoutY="49.0" orientation="VERTICAL" prefHeight="25.0" prefWidth="6.0" visible="false" />
+        <Text fx:id="youngerThanDate" layoutX="195.0" layoutY="66.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Younger than date" textAlignment="CENTER" visible="false" />
+        <TextField fx:id="dateGetFrom" layoutX="300.0" layoutY="50.0" prefHeight="25.0" prefWidth="80.0" promptText="dd.MM.yyyy" visible="false" />
+        <Separator layoutX="390.0" layoutY="50.0" orientation="VERTICAL" prefHeight="25.0" prefWidth="6.0" />
+        <Button fx:id="startValidation" layoutX="400.0" layoutY="50.0" mnemonicParsing="false" onAction="#initialize" prefWidth="100.0" text="Start Validation" />
+        <Separator layoutX="505.0" layoutY="50.0" orientation="VERTICAL" prefHeight="25.0" prefWidth="6.0" />
+        <ListView fx:id="listView" layoutY="90.0" prefHeight="400.0" prefWidth="900.0" />
         <ProgressIndicator fx:id="indicator" cache="true" layoutX="425.0" layoutY="230.0">
             <effect>
-                <InnerShadow/>
+                <InnerShadow />
             </effect>
         </ProgressIndicator>
     </AnchorPane>

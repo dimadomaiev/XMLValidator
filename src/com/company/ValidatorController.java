@@ -41,7 +41,7 @@ public class ValidatorController {
     private MenuItem clearConsole;
 
     @FXML
-    private MenuItem moreOptions;
+    private MenuItem takeFilesOlderThanDate;
 
     @FXML
     private MenuItem openConfigFile;
@@ -92,15 +92,6 @@ public class ValidatorController {
     private TextField schemaFilePath;
 
     @FXML
-    private Separator separator1;
-
-    @FXML
-    private CheckBox onlyCurrMonthFolder;
-
-    @FXML
-    private Separator separator2;
-
-    @FXML
     private Text youngerThanDate;
 
     @FXML
@@ -123,7 +114,7 @@ public class ValidatorController {
         SimpleXMLValidator.createConfigFile();
         initializeSelectedEnvironment();
         try {
-            if (SimpleXMLValidator.envs.isEmpty()) {
+            if (SimpleXMLValidator.environments.isEmpty()) {
                 SimpleXMLValidator.initialEnvironments();
             }
         } catch (IOException e) {
@@ -206,15 +197,11 @@ public class ValidatorController {
             System.out.println(consoleToArea = "Sorry for inconvenience." + "\n" + "Wiki page does not exist at this moment.");
             writeToLogFile();
         });
-        //Show/hide objects by event on moreOptions in the Edit menu
-        moreOptions.setOnAction(event -> {
-            onlyCurrMonthFolder.setVisible(!onlyCurrMonthFolder.isVisible() && ftpTab.isSelected());
-            youngerThanDate.setVisible(!youngerThanDate.isVisible() && ftpTab.isSelected());
-            dateGetFrom.setVisible(!dateGetFrom.isVisible() && ftpTab.isSelected());
-            separator1.setVisible(!separator1.isVisible() && ftpTab.isSelected());
-            separator2.setVisible(!separator2.isVisible() && ftpTab.isSelected());
+        //Show/hide objects by event on "Date older" in the Edit menu
+        takeFilesOlderThanDate.setOnAction(event -> {
+            youngerThanDate.setVisible(!youngerThanDate.isVisible());
+            dateGetFrom.setVisible(!dateGetFrom.isVisible());
         });
-
     }
 
     //Set the path to the file in the field after selecting the file
