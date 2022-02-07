@@ -203,26 +203,20 @@ public class SimpleXMLValidator extends Application {
                 manualDir = "";
 
                 if (baseFolder.startsWith("/")) {
-                    //System.out.println("Удаление 1-го символа строки: ");
-                    //System.out.println("baseFolder до - " + baseFolder);
                     baseFolder = baseFolder.substring(1);
-                    //System.out.println("baseFolder после - " + baseFolder);
                 }
             }
 
         }
         FTPFile[] dirs = ftpClient.listDirectories(baseFolder + manualDir);
-        //System.out.println(dirs.length);
 
         if (!selectedEnvironment.equals("Other") && !(dirs.length == 0)) {
-            //FTPFile[] dirs = ftpClient.listDirectories(baseFolder + manualDir);
             for (FTPFile dir : dirs) {
                 System.out.println("Dir name - " + dir.getName() + "\n");
                 ftpFileLoader(ftpClient, baseFolder + manualDir + "/" + dir.getName(), tempFiles);
             }
         }
         if (selectedEnvironment.equals("Other") && !(dirs.length == 0)) {
-            // FTPFile[] dirs = ftpClient.listDirectories(baseFolder);
             for (FTPFile dir : dirs) {
                 System.out.println("Dir name - " + dir.getName() + "\n");
                 ftpFileLoader(ftpClient, baseFolder + "/" + dir.getName(), tempFiles);
@@ -237,28 +231,9 @@ public class SimpleXMLValidator extends Application {
             return;
         }
 
-        /*
-        if ((FTPManualDir.isEmpty() & !selectedEnvironment.equals("Other"))) {
-            for (FTPFile dir : dirs) {
-                System.out.println("Dir name - " + dir.getName() + "\n");
-                ftpFileLoader(ftpClient, baseFolder + dir.getName(), tempFiles);
-            }
-        }
-        if ((otherFTPManualDir.isEmpty() & selectedEnvironment.equals("Other"))) {
-            for (FTPFile dir : dirs) {
-                System.out.println("Dir name - " + dir.getName() + "\n");
-                ftpFileLoader(ftpClient, baseFolder + dir.getName(), tempFiles);
-            }
-        }
-        if (!FTPManualDir.isEmpty()) {
-            System.out.println("manualDir - " + FTPManualDir + "\n");
-            ftpFileLoader(ftpClient, baseFolder + FTPManualDir, tempFiles);
-        }
-        */
-
         ftpClient.logout();
         System.out.println("Logout.");
-        //ftpClient.disconnect();
+        ftpClient.disconnect();
     }
 
     public static void selectFilesFromDir(String path) {
@@ -277,6 +252,7 @@ public class SimpleXMLValidator extends Application {
         if (!folder.isDirectory()) {
             xmlFile = folder;
         }
+        assert listOfFiles != null;
         if (listOfFiles.length == 0){
             System.out.println(ValidatorController.consoleToArea = "Temp folder is empty!");
         }
@@ -287,13 +263,6 @@ public class SimpleXMLValidator extends Application {
         if (!Files.exists(Paths.get(localPath))) {
             Files.createDirectories(Paths.get(localPath));
         }
-        /*
-        File dirChecker = new File(remotePath);
-        if (dirChecker.isDirectory()) {
-            ftpFileLoader(ftpClient, remoteFilePath, localPath);
-        }
-         */
-
         System.out.println("Downloading folder " + remotePath + " to " + localPath);
         FTPFile[] remoteFiles = ftpClient.listFiles(remotePath);
         for (FTPFile remoteFile : remoteFiles) {
