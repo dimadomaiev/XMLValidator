@@ -348,7 +348,6 @@ public class ValidatorController {
         }
         //----------------------------------------------------Local-Tab-------------------------------------------------
         if (localTab.isSelected()) {
-            writeToLogFile();
             long startLocalCopyingTime = System.nanoTime();
             indicator.setVisible(true);
             if (SimpleXMLValidator.pathForFiles == null & ((SimpleXMLValidator.xmlFile.getName().endsWith(".xml") | SimpleXMLValidator.xmlFile.getName().endsWith(".zip")))) {
