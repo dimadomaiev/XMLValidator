@@ -7,6 +7,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 import org.xml.sax.SAXException;
 
@@ -104,15 +105,24 @@ public class ValidatorController {
     private ListView<String> listView;
 
     @FXML
+    private TextFlow textFlow;
+
+    @FXML
     private ProgressIndicator indicator;
 
     //----------------------------------------------------initialize----------------------------------------------------
     @FXML
     private void initialize() {
+
+
+
+
+
         SimpleXMLValidator.deleteAllFilesWithDirs(new File(SimpleXMLValidator.tempFiles));
         deleteInvalidFilesAlert();
         SimpleXMLValidator.createConfigFile();
         initializeSelectedEnvironment();
+        initListView();
         try {
             if (SimpleXMLValidator.environments.isEmpty()) {
                 SimpleXMLValidator.initialEnvironments();
@@ -303,8 +313,24 @@ public class ValidatorController {
             writer.close();
             listView.getItems().add(consoleToArea);
             //textFlow.getChildren().add(new Text(consoleToArea));
-        } catch (IOException | IllegalStateException e) {
+            //displayFileContent();
+        } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    void initListView(){
+        listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+    }
+
+    private void displayFileContent() throws Exception {
+        try (BufferedReader in = new BufferedReader(new FileReader(SimpleXMLValidator.logFile))) {
+            String line;
+            while ((line = in.readLine()) != null) {
+                System.out.println(line);
+                textFlow.getChildren().add(new Text(line));
+                listView.getItems().add(line);
+            }
         }
     }
 
