@@ -105,19 +105,11 @@ public class ValidatorController {
     private ListView<String> listView;
 
     @FXML
-    private TextFlow textFlow;
-
-    @FXML
     private ProgressIndicator indicator;
 
     //----------------------------------------------------initialize----------------------------------------------------
     @FXML
     private void initialize() {
-
-
-
-
-
         SimpleXMLValidator.deleteAllFilesWithDirs(new File(SimpleXMLValidator.tempFiles));
         deleteInvalidFilesAlert();
         SimpleXMLValidator.createConfigFile();
@@ -312,8 +304,6 @@ public class ValidatorController {
             writer.println(consoleToArea);
             writer.close();
             listView.getItems().add(consoleToArea);
-            //textFlow.getChildren().add(new Text(consoleToArea));
-            //displayFileContent();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -321,17 +311,6 @@ public class ValidatorController {
 
     void initListView(){
         listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-    }
-
-    private void displayFileContent() throws Exception {
-        try (BufferedReader in = new BufferedReader(new FileReader(SimpleXMLValidator.logFile))) {
-            String line;
-            while ((line = in.readLine()) != null) {
-                System.out.println(line);
-                textFlow.getChildren().add(new Text(line));
-                listView.getItems().add(line);
-            }
-        }
     }
 
     //Tread running

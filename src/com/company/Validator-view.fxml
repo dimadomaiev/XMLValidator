@@ -17,7 +17,6 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
-<?import javafx.scene.text.TextFlow?>
 
 <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/1.8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.company.ValidatorController">
     <MenuBar VBox.vgrow="NEVER">
@@ -79,7 +78,6 @@
         <Button fx:id="startValidation" layoutX="400.0" layoutY="50.0" mnemonicParsing="false" onAction="#initialize" prefWidth="100.0" text="Start Validation" />
         <Separator layoutX="505.0" layoutY="50.0" orientation="VERTICAL" prefHeight="25.0" prefWidth="6.0" />
         <ListView fx:id="listView" layoutY="90.0" prefHeight="400.0" prefWidth="900.0" />
-      <TextFlow fx:id="textFlow" disable="true" layoutY="90.0" prefHeight="400.0" prefWidth="900.0" visible="false" />
         <ProgressIndicator fx:id="indicator" cache="true" layoutX="425.0" layoutY="230.0">
             <effect>
                 <InnerShadow />
