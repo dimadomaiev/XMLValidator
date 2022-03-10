@@ -1,10 +1,16 @@
 package com.company;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ListView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -19,8 +25,10 @@ import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 import java.awt.*;
 import java.io.*;
+import java.util.ArrayList;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.IntStream;
 
 public class ValidatorController {
     public static String pathForSchema;
@@ -106,9 +114,14 @@ public class ValidatorController {
     @FXML
     private ProgressIndicator indicator;
 
+    @FXML
+    private TextField searchField;
+
+
     //----------------------------------------------------initialize----------------------------------------------------
     @FXML
     private void initialize() {
+        //filterListFromStackOverflow2();
         SimpleXMLValidator.deleteAllFilesWithDirs(new File(SimpleXMLValidator.tempFiles));
         deleteInvalidFilesAlert();
         SimpleXMLValidator.createConfigFile();
@@ -303,12 +316,14 @@ public class ValidatorController {
             writer.println(consoleToArea);
             writer.close();
             listView.getItems().add(consoleToArea);
+            redFromFile();
+            //readFileLines(String.valueOf(SimpleXMLValidator.logFile));
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    void initListView(){
+    void initListView() {
         listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     }
 
@@ -580,4 +595,72 @@ public class ValidatorController {
         System.out.println(consoleToArea = "Time: \n" + "sec.: " + totalTimeInMilliseconds / 1000 + "\nms.: " + totalTimeInMilliseconds);
         writeToLogFile();
     }
+//----------------------------------------------------------------------------------------------------------------------
+    void filterListFromStackOverflow() {
+        ObservableList<String> rawData= FXCollections.observableArrayList();
+        FilteredList<String> filteredList= new FilteredList<>(rawData, data -> true);
+        listView.setItems(filteredList);
+        searchField.textProperty().addListener(((observable, oldValue, newValue) -> {
+            filteredList.setPredicate(data -> {
+                if (newValue == null || newValue.isEmpty()){
+                    return true;
+                }
+                String lowerCaseSearch=newValue.toLowerCase();
+                return Boolean.parseBoolean(String.valueOf(data.contains(lowerCaseSearch)));
+            });
+        }));
+    }
+
+    void redFromFile() throws IOException {
+        listView.getItems().clear();
+        FileReader fr = new FileReader(SimpleXMLValidator.logFile);
+        BufferedReader br = new BufferedReader(fr);
+        String line;
+        while((line = br.readLine()) != null) { listView.getItems().add(line);}
+
+        //listView.getItems().add(String.valueOf(SimpleXMLValidator.logFile));
+
+
+        searchField.textProperty().addListener(new ChangeListener() {
+            public void changed(ObservableValue observable, Object oldVal,
+                                Object newVal) {
+                search((String) oldVal, (String) newVal);
+            }
+        });
+    }
+
+    public void search(String oldVal, String newVal) {
+        if (oldVal != null && (newVal.length() < oldVal.length())) {
+            list.setItems(entries);
+        }
+        String value = newVal.toUpperCase();
+        ObservableList<String> subentries = FXCollections.observableArrayList();
+        for (Object entry : list.getItems()) {
+            boolean match = true;
+            String entryText = (String) entry;
+            if (!entryText.toUpperCase().contains(value)) {
+                match = false;
+                break;
+            }
+            if (match) {
+                subentries.add(entryText);
+            }
+        }
+        list.setItems(subentries);
+    }
+
+    private ArrayList<String> readFileLines(String filepath) throws FileNotFoundException, IOException{
+        File fp = new File(filepath);
+        FileReader fr = new FileReader(fp);
+        BufferedReader br = new BufferedReader(fr);
+
+        ArrayList<String> lines = new ArrayList<>();
+        String line;
+        while((line = br.readLine()) != null) { lines.add(line); }
+
+        fr.close();
+        listView.getItems().add(String.valueOf(lines));
+        return lines;
+    }
+
 }
